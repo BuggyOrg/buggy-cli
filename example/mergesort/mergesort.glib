@@ -62,7 +62,7 @@
             {"meta": "mergesort", "name": "m2"},
             {"meta": "mergesort/merge", "name": "me"}
           ],
-          "nodes": [
+          "edges": [
             {"from": "list", "to": "s:list"},
             {"from": "s:lower", "to": "m1:list"},
             {"from": "s:upper", "to": "m2:list"},

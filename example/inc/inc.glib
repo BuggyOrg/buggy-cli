@@ -1,0 +1,33 @@
+{
+  "options": {
+    "directed": true,
+    "multigraph": true,
+    "compound": true
+  },
+  "nodes": [
+    {
+      "v": "main",
+      "value": {
+        "version": "1.0.0",
+        "meta": "main",
+        "inputPorts": {
+        },
+        "outpuPorts": {
+        },
+        "implementation": {
+          "nodes": [
+            {"meta": "io/stdin", "version": "0.1.0", "name": "in"},
+            {"meta": "math/inc", "version": "0.2.0", "name": "inc"},
+            {"meta": "io/stdout", "version": "0.1.0", "name": "out"}
+          ],
+          "edges": [
+            {"from": "in:stdin/input", "to": "inc:i"},
+            {"from": "inc:inc", "to": "out:stdout/output"}
+          ]
+        }
+      }
+    }
+  ],
+  "edges": [],
+  "value": {}
+}
