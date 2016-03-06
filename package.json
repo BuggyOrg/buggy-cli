@@ -1,0 +1,24 @@
+{
+  "name": "@buggyorg/buggy",
+  "version": "0.1.0",
+  "description": "Rich code generation system.",
+  "main": "api.js",
+  "bin": {
+    "buggy": "cli.js"
+  },
+  "scripts": {
+    "test": "node node_modules/standard/bin/cmd.js src/**/*.js && gulp && node_modules/mocha/bin/mocha --compilers js:babel/register",
+    "build": "babel src -d lib",
+    "prepublish": "babel src -d lib"
+  },
+  "keywords": [
+    "Code-Generation"
+  ],
+  "author": "Maximilian Klein",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "babel-register": "^6.3.13",
+    "standard": "^5.4.1"
+  }
+}

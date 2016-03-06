@@ -1,0 +1,79 @@
+{
+  "options": {
+    "directed": true,
+    "multigraph": true,
+    "compound": true
+  },
+  "nodes": [
+    {
+      "v": "mergesort/smallest",
+      "value": {
+        "inputPorts": {
+          "list1": "array<generic>",
+          "list2": "array<generic>"
+        },
+        "outpuPorts": {
+          "smallest": "generic",
+          "remainingList1": "array<generic>",
+          remainingList2": "array<generic>"
+        },
+        "juggy": "smallest = (min list1[0] list2[0]); remainingList1 = (branch (> list1[0] list2[0]) list1 (rest list1)); remainingList2 = (branch list2[0] (>= list1[0] list2) (rest list2))"
+      }
+    },
+    {
+      "v": "mergesort/split",
+      "value": {
+        "inputPorts": {
+          "list": "array<generic>"
+        },
+        "outputPorts": {
+          "lower": "array<generic>",
+          "upper": "array<generic>" 
+        },
+        "juggy": "lower = (filter list (lambda (i idx len) (< idx (/ (len list) 2)))); upper = (filter list (lambda (i idx len) (>= idx (/ (len list) 2))))"
+      }
+    },
+    {
+      "v": "mergesort/merge",
+      "value": {
+        "inputPorts": {
+         "list1": "array<generic>",
+         "list2": "array<generic>"
+        }, 
+        "outputPorts": {
+          "merged": "array<generic>"
+        },
+      }
+    },
+    {
+      "v": "mergesort",
+      "value": {
+        "inPort": {
+          "list": "array<generic>"
+        },
+        "outPort": {
+          "sortedList": "array<generic>"
+        },
+        "meta": "mergesort",
+        "implementation": {
+          "nodes": [
+            {"meta": "mergesort/split", "name": "s"},
+            {"meta": "mergesort", name: "m1"},
+            {"meta": "mergesort", "name": "m2"},
+            {"meta": "mergesort/merge", "name": "me"}
+          ],
+          "nodes": [
+            {"from": "list", "to": "s:list"},
+            {"from": "s:lower", "to": "m1:list"},
+            {"from": "s:upper", "to": "m2:list"},
+            {"from": "m1:sortedList", "to": "me:list1"},
+            {"from": "m2:sortedList", "to": "me"list2"},
+            {"from": "me:merged", "to": "sortedList"}
+          ]
+        }
+      }
+    }
+  ],
+  "edges": [],
+  "value": {}
+}
