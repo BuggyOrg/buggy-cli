@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@buggyorg/component-library": "^0.3.1",
+    "@buggyorg/npg-port-remodeler": "^0.1.3",
     "@buggyorg/resolve": "^0.1.3",
     "graphlib": "^2.1.0"
   }

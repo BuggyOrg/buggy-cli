@@ -10,8 +10,16 @@
       "value": {"meta": "io/stdin", "version": "0.1.0"}
     },
     {
+      "v": "strToNum",
+      "value": {"meta": "translator/string_to_int", "version": "0.1.0"}
+    },
+    {
       "v": "inc",
       "value": {"meta": "math/inc", "version": "0.2.0", "name": "inc"}
+    },
+    {
+      "v": "numToStr",
+      "value": {"meta": "translator/int_to_string", "version": "0.1.0"}
     },
     {
       "v": "out",
@@ -21,17 +29,33 @@
   "edges": [
     {
       "v": "in",
-      "w": "inc",
+      "w": "strToNum",
       "value": {
         "outPort": "stdin/input",
+        "inPort": "string_to_int/input"
+      }
+    },
+    {
+      "v": "strToNum",
+      "w": "inc",
+      "value": {
+        "outPort": "string_to_int/output",
         "inPort": "i"
       }
     },
     {
       "v": "inc",
-      "w": "out",
+      "w": "numToStr",
       "value": {
         "outPort": "inc",
+        "inPort": "int_to_strint/input"
+      }
+    },
+    {
+      "v": "numToStr",
+      "w": "out",
+      "value": {
+        "outPort": "int_to_string/output",
         "inPort": "stdout/output"
       }
     }

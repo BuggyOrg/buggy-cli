@@ -5,6 +5,7 @@ import program from 'commander'
 import fs from 'fs'
 import lib from '@buggyorg/component-library'
 import {resolve} from '@buggyorg/resolve'
+import {remodelPorts} from '@buggyorg/npg-port-remodeler'
 import graphlib from 'graphlib'
 
 var server = ''
@@ -28,9 +29,21 @@ program
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
   .action((json, language, options) => {
-    var client = lib(program.host)
+    var client = lib(program.elastic)
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
-    .then((res) => console.log(JSON.stringify(res)))
+    .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
+    .catch((err) => console.error(err.stack))
+  })
+
+program
+  .command('ng <json>')
+  .option('-o, --output <outputFile>', 'The output filename to generate')
+  .description('Compile a program description into a program using a specific language.')
+  .action((json, language, options) => {
+    var client = lib(program.elastic)
+    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    .then((res) => remodelPorts(res))
+    .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
     .catch((err) => console.error(err.stack))
   })
 
