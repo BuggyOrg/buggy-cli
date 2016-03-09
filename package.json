@@ -7,7 +7,7 @@
     "buggy": "cli.js"
   },
   "scripts": {
-    "test": "node node_modules/standard/bin/cmd.js src/**/*.js && gulp && node_modules/mocha/bin/mocha --compilers js:babel/register",
+    "test": "node node_modules/standard/bin/cmd.js src/**/*.js && babel src -d lib && node_modules/mocha/bin/mocha --compilers js:babel/register",
     "build": "babel src -d lib",
     "prepublish": "babel src -d lib"
   },
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@buggyorg/component-library": "^0.3.1",
-    "@buggyorg/npg-port-remodeler": "^0.1.3",
+    "@buggyorg/npg-port-remodeler": "^0.1.4",
     "@buggyorg/resolve": "^0.1.3",
     "graphlib": "^2.1.0"
   }
