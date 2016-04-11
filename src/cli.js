@@ -6,6 +6,7 @@ import fs from 'fs'
 import lib from '@buggyorg/component-library'
 import {resolve} from '@buggyorg/resolve'
 import {remodelPorts} from '@buggyorg/npg-port-remodeler'
+import {normalize} from '@buggyorg/dupjoin'
 import graphlib from 'graphlib'
 
 var server = ''
@@ -42,6 +43,7 @@ program
   .action((json, language, options) => {
     var client = lib(program.elastic)
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    .then((res) => normalize(res))
     .then((res) => remodelPorts(res))
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
     .catch((err) => {
