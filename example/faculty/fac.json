@@ -14,8 +14,8 @@
       "value": {"meta": "translator/string_to_int", "version": "0.2.0"}
     },
     {
-      "v": "inc",
-      "value": {"meta": "math/inc", "version": "0.3.0", "name": "inc"}
+      "v": "fac",
+      "value": {"meta": "math/faculty", "version": "0.1.2"}
     },
     {
       "v": "numToStr",
@@ -37,17 +37,17 @@
     },
     {
       "v": "strToNum",
-      "w": "inc",
+      "w": "fac",
       "value": {
         "outPort": "output",
-        "inPort": "i"
+        "inPort": "n"
       }
     },
     {
-      "v": "inc",
+      "v": "fac",
       "w": "numToStr",
       "value": {
-        "outPort": "inc",
+        "outPort": "fac",
         "inPort": "input"
       }
     },

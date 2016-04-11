@@ -44,7 +44,10 @@ program
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
     .then((res) => remodelPorts(res))
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
-    .catch((err) => console.error(err.stack))
+    .catch((err) => {
+      console.error('error while transpiling')
+      console.error(err.stack)
+    })
   })
 
 program.parse(process.argv)
