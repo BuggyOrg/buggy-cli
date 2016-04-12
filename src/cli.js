@@ -37,6 +37,18 @@ program
   })
 
 program
+  .command('dup <json>')
+  .option('-o, --output <outputFile>', 'The output filename to generate')
+  .description('Compile a program description into a program using a specific language.')
+  .action((json, language, options) => {
+    var client = lib(program.elastic)
+    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    .then((res) => normalize(res))
+    .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
+    .catch((err) => console.error(err.stack))
+  })
+
+program
   .command('ng <json>')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
