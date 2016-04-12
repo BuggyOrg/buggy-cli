@@ -25,7 +25,7 @@
   "dependencies": {
     "@buggyorg/component-library": "^0.3.1",
     "@buggyorg/dupjoin": "^0.1.3",
-    "@buggyorg/npg-port-remodeler": "^0.1.6",
+    "@buggyorg/npg-port-remodeler": "^0.1.7",
     "@buggyorg/resolve": "^0.1.8",
     "graphlib": "^2.1.0"
   }
