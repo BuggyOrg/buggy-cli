@@ -8,6 +8,7 @@ import {resolve} from '@buggyorg/resolve'
 import {remodelPorts} from '@buggyorg/npg-port-remodeler'
 import {normalize} from '@buggyorg/dupjoin'
 import graphlib from 'graphlib'
+import * as gogen from '@buggyorg/gogen'
 
 var server = ''
 var defaultElastic = ' Defaults to BUGGY_COMPONENT_LIBRARY_HOST'
@@ -26,14 +27,33 @@ program
   .parse(process.argv)
 
 program
+  .command('resolve <json>')
+  .option('-o, --output <outputFile>', 'The output filename to generate')
+  .description('Compile a program description into a program using a specific language.')
+  .action((json, options) => {
+    var client = lib(program.elastic)
+    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
+    .catch((err) => console.error(err.stack))
+  })
+
+
+program
   .command('compile <json> <language>')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
   .action((json, language, options) => {
     var client = lib(program.elastic)
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
-    .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
-    .catch((err) => console.error(err.stack))
+    .then((res) => normalize(res))
+    .then((res) => remodelPorts(res))
+    .then((res) => gogen.preprocess(res))
+    .then((res) => gogen.generateCode(res))
+    .then((res) => console.log(res))
+    .catch((err) => {
+      console.error('error while transpiling')
+      console.error(err.stack)
+    })
   })
 
 program
