@@ -25,9 +25,11 @@
   "dependencies": {
     "@buggyorg/component-library": "^0.3.1",
     "@buggyorg/dupjoin": "^0.1.3",
+    "@buggyorg/dynatype-network-graph": "^0.1.2",
     "@buggyorg/gogen": "^0.1.1",
     "@buggyorg/npg-port-remodeler": "^0.1.7",
     "@buggyorg/resolve": "^0.1.9",
+    "@buggyorg/typify": "^0.1.0",
     "commander": "^2.9.0",
     "graphlib": "^2.1.0"
   }

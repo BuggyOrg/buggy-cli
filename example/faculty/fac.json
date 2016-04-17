@@ -11,15 +11,15 @@
     },
     {
       "v": "strToNum",
-      "value": {"meta": "translator/string_to_int", "version": "0.2.0"}
+      "value": {"meta": "translator/string_to_number", "version": "0.1.0"}
     },
     {
       "v": "fac",
-      "value": {"meta": "math/faculty", "version": "0.1.8"}
+      "value": {"meta": "math/faculty", "version": "0.2.0"}
     },
     {
       "v": "numToStr",
-      "value": {"meta": "translator/int_to_string", "version": "0.2.0"}
+      "value": {"meta": "translator/number_to_string", "version": "0.1.0"}
     },
     {
       "v": "out",
