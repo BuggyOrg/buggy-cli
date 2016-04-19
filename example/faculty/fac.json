@@ -15,7 +15,7 @@
     },
     {
       "v": "fac",
-      "value": {"meta": "math/faculty", "version": "0.2.0"}
+      "value": {"meta": "math/faculty", "version": "0.2.1"}
     },
     {
       "v": "numToStr",

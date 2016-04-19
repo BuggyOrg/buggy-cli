@@ -48,11 +48,12 @@ program
     var client = lib(program.elastic)
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
     .then((res) => normalize(res))
-    .then((res) => applyTypings(res, {number: 'int', bool: 'bool', string: 'string'}))
+    .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => remodelPorts(res))
     .then((res) => replaceGenerics(res))
     .then((res) => gogen.preprocess(res))
     .then((res) => gogen.generateCode(res))
+//    .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
     .then((res) => console.log(res))
     .catch((err) => {
       console.error('error while transpiling')
