@@ -1,0 +1,71 @@
+{
+  "options": {
+    "directed": true,
+    "multigraph": true,
+    "compound": true
+  },
+  "nodes": [
+    {
+      "v": "in",
+      "value": {"meta": "io/stdin", "version": "0.2.0"}
+    },
+    {
+      "v": "strToNum",
+      "value": {"meta": "translator/string_to_number", "version": "0.1.0"}
+    },
+    {
+      "v": "lambda_inc",
+      "value": {"meta": "functional/lambda", "version": "0.1.0", "params": {"implementation": "inc_lambda"}}
+    },
+    {
+      "v": "inc_lambda",
+      "value": {"meta": "math/inc", "version": "0.3.0"}
+    },
+    {
+      "v": "apply",
+      "value": {"meta": "functional/apply", "version": "0.1.0"}
+    },
+    {
+      "v": "numToStr",
+      "value": {"meta": "translator/number_to_string", "version": "0.1.0"}
+    },
+    {
+      "v": "out",
+      "value": {"meta": "io/stdout", "version": "0.2.0", "name": "out"}
+    }
+  ],
+  "edges": [
+    {
+      "v": "in",
+      "w": "strToNum",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "strToNum",
+      "w": "apply",
+      "value": {
+        "outPort": "output",
+        "inPort": "value"
+      }
+    },
+    {
+      "v": "lambda_inc",
+      "w": "apply",
+      "value": {
+        "outPort": "fn",
+        "inPort": "fn"
+      }
+    },
+    {
+      "v": "apply",
+      "w": "out",
+      "value": {
+        "outPort": "result",
+        "inPort": "input"
+      }
+    }
+  ]
+}
