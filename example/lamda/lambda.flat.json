@@ -15,15 +15,15 @@
     },
     {
       "v": "lambda_inc",
-      "value": {"meta": "functional/lambda", "version": "0.1.0", "params": {"implementation": "inc_lambda"}}
+      "value": {"meta": "functional/lambda", "version": "0.1.0", "params": {"implementation": "math/inc"}}
     },
     {
       "v": "inc_lambda",
-      "value": {"meta": "math/inc", "version": "0.3.0"}
+      "value": {"meta": "math/inc", "version": "0.4.1"}
     },
     {
       "v": "apply",
-      "value": {"meta": "functional/apply", "version": "0.1.0"}
+      "value": {"meta": "functional/apply", "version": "0.1.1"}
     },
     {
       "v": "numToStr",
@@ -61,9 +61,17 @@
     },
     {
       "v": "apply",
-      "w": "out",
+      "w": "numToStr",
       "value": {
         "outPort": "result",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "numToStr",
+      "w": "out",
+      "value": {
+        "outPort": "output",
         "inPort": "input"
       }
     }
