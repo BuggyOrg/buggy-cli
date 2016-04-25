@@ -1,0 +1,79 @@
+{
+  "options": {
+    "directed": true,
+    "multigraph": true,
+    "compound": true
+  },
+  "nodes": [
+    {
+      "v": "in",
+      "value": {"meta": "io/stdin", "version": "0.2.0"}
+    },
+    {
+      "v": "strToArr",
+      "value": {"meta": "translator/string_to_array", "version": "0.1.0", "typeHint": {"output": "[number]"}}
+    },
+    {
+      "v": "lambda_inc",
+      "value": {"meta": "functional/lambda", "version": "0.1.0", "params": {"implementation": "math/inc"}}
+    },
+    {
+      "v": "inc_lambda",
+      "value": {"meta": "math/inc", "version": "0.4.1"}
+    },
+    {
+      "v": "reduce",
+      "value": {"meta": "functional/reduce", "version": "0.1.0", "typeHint": {"data": "[number]", "output": "[number]"}}
+    },
+    {
+      "v": "arrToStr",
+      "value": {"meta": "translator/array_to_string", "version": "0.1.0", "typeHint": {"input": "[number]"}}
+    },
+    {
+      "v": "out",
+      "value": {"meta": "io/stdout", "version": "0.2.0", "name": "out"}
+    }
+  ],
+  "edges": [
+    {
+      "v": "in",
+      "w": "strToArr",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "arrToNum",
+      "w": "reduce",
+      "value": {
+        "outPort": "output",
+        "inPort": "value"
+      }
+    },
+    {
+      "v": "lambda_inc",
+      "w": "reduce",
+      "value": {
+        "outPort": "fn",
+        "inPort": "fn"
+      }
+    },
+    {
+      "v": "reduce",
+      "w": "arrToStr",
+      "value": {
+        "outPort": "result",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "arrToStr",
+      "w": "out",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    }
+  ]
+}
