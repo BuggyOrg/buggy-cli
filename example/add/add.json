@@ -1,0 +1,77 @@
+{
+  "options": {
+    "directed": true,
+    "multigraph": true,
+    "compound": true
+  },
+  "nodes": [
+    {
+      "v": "in",
+      "value": {"meta": "io/stdin", "version": "0.2.0"}
+    },
+    {
+      "v": "strToNum",
+      "value": {"meta": "translator/string_to_number", "version": "0.1.0"}
+    },
+    {
+      "v": "const",
+      "value": {"meta": "math/const", "version": "0.1.0", "params": {
+        "value": 17
+        }}
+    },
+    {
+      "v": "add",
+      "value": {"meta": "math/add", "version": "0.2.0"}
+    },
+    {
+      "v": "numToStr",
+      "value": {"meta": "translator/number_to_string", "version": "0.1.0"}
+    },
+    {
+      "v": "out",
+      "value": {"meta": "io/stdout", "version": "0.2.0", "name": "out"}
+    }
+  ],
+  "edges": [
+    {
+      "v": "in",
+      "w": "strToNum",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "strToNum",
+      "w": "add",
+      "value": {
+        "outPort": "output",
+        "inPort": "s1"
+      }
+    },
+    {
+      "v": "const",
+      "w": "add",
+      "value": {
+        "outPort": "output",
+        "inPort": "s2"
+      }
+    },
+    {
+      "v": "add",
+      "w": "numToStr",
+      "value": {
+        "outPort": "sum",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "numToStr",
+      "w": "out",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    }
+  ]
+}
