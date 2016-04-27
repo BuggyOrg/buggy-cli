@@ -1,5 +1,3 @@
 
-
-export function gatherTools() {
-  
+export function gatherTools () {
 }

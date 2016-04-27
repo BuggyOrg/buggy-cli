@@ -45,7 +45,6 @@ program
     .catch((err) => console.error(err.stack))
   })
 
-
 program
   .command('svg <json>')
   .option('-b, --bare', 'Do not resolve the graph file')

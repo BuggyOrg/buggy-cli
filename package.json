@@ -7,7 +7,7 @@
     "buggy": "./lib/cli.js"
   },
   "scripts": {
-    "test": "node node_modules/standard/bin/cmd.js src/**/*.js && babel src -d lib && node_modules/mocha/bin/mocha --compilers js:babel/register",
+    "test": "node node_modules/standard/bin/cmd.js src/**/*.js && echo no tests",
     "build": "babel src -d lib",
     "prepublish": "babel src -d lib"
   },
