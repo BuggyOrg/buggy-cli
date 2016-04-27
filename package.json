@@ -2,9 +2,9 @@
   "name": "@buggyorg/buggy",
   "version": "0.1.0",
   "description": "Rich code generation system.",
-  "main": "api.js",
+  "main": "./lib/api.js",
   "bin": {
-    "buggy": "cli.js"
+    "buggy": "./lib/cli.js"
   },
   "scripts": {
     "test": "node node_modules/standard/bin/cmd.js src/**/*.js && babel src -d lib && node_modules/mocha/bin/mocha --compilers js:babel/register",
