@@ -8,10 +8,15 @@ import {resolve} from '@buggyorg/resolve'
 import {remodelPorts} from '@buggyorg/npg-port-remodeler'
 import {normalize} from '@buggyorg/dupjoin'
 import {applyTypings} from '@buggyorg/typify'
+import {convertGraph} from '@buggyorg/graphlib2kgraph'
+import kgraph2Svg from '@buggyorg/graphify'
 import graphlib from 'graphlib'
 import * as gogen from '@buggyorg/gogen'
 import {replaceGenerics} from '@buggyorg/dynatype-network-graph'
 import {resolveLambdaTypes} from '@buggyorg/functional'
+import promisedExec from 'promised-exec'
+import tempfile from 'tempfile'
+import path from 'path'
 
 var server = ''
 var defaultElastic = ' Defaults to BUGGY_COMPONENT_LIBRARY_HOST'
@@ -40,6 +45,23 @@ program
     .catch((err) => console.error(err.stack))
   })
 
+
+program
+  .command('svg <json>')
+  .description('Create a SVG flow chart diagram for the given json file.')
+  .action((json) => {
+    var client = lib(program.elastic)
+    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    .then((res) => convertGraph(res))
+    .then((res) => {
+      var f = tempfile('.json')
+      fs.writeFileSync(f, JSON.stringify(res))
+      return promisedExec('node ' + path.join(__dirname, '../node_modules/@buggyorg/graphify/lib/cli.js') + ' "' + f + '"')
+        .then(() => { fs.unlinkSync(f) })
+    })
+    .then((res) => console.log(res))
+    .catch((err) => console.error(err.stack))
+  })
 
 program
   .command('compile <json> <language>')
