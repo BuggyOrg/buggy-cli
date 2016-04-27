@@ -9,7 +9,7 @@ import {remodelPorts} from '@buggyorg/npg-port-remodeler'
 import {normalize} from '@buggyorg/dupjoin'
 import {applyTypings} from '@buggyorg/typify'
 import {convertGraph} from '@buggyorg/graphlib2kgraph'
-import kgraph2Svg from '@buggyorg/graphify'
+// import kgraph2Svg from '@buggyorg/graphify'
 import graphlib from 'graphlib'
 import * as gogen from '@buggyorg/gogen'
 import {replaceGenerics} from '@buggyorg/dynatype-network-graph'
@@ -48,17 +48,26 @@ program
 
 program
   .command('svg <json>')
+  .option('-b, --bare', 'Do not resolve the graph file')
   .description('Create a SVG flow chart diagram for the given json file.')
-  .action((json) => {
+  .action((json, options) => {
     var client = lib(program.elastic)
-    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    var resPromise = null
+    if (options.bare) {
+      resPromise = Promise.resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))))
+    } else {
+      resPromise = resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    }
+    resPromise
     .then((res) => convertGraph(res))
     .then((res) => {
       var f = tempfile('.json')
       fs.writeFileSync(f, JSON.stringify(res))
+      // sadly the API call didn't work start the CLI variant
       return promisedExec('node ' + path.join(__dirname, '../node_modules/@buggyorg/graphify/lib/cli.js') + ' "' + f + '"')
         .then(() => { fs.unlinkSync(f) })
     })
+    // .then((res) => kgraph2Svg(res))
     .then((res) => console.log(res))
     .catch((err) => console.error(err.stack))
   })
