@@ -62,7 +62,7 @@ program
     .then((res) => {
       var f = tempfile('.json')
       fs.writeFileSync(f, JSON.stringify(res))
-      // sadly the API call didn't work start the CLI variant
+      // sadly the API call didn't work. Start the CLI variant
       return promisedExec('node ' + path.join(__dirname, '../node_modules/@buggyorg/graphify/lib/cli.js') + ' "' + f + '"')
         // .then(() => { fs.unlinkSync(f) })
     })
