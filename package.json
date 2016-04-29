@@ -29,7 +29,7 @@
     "@buggyorg/functional": "^0.1.0",
     "@buggyorg/gogen": "^0.1.4",
     "@buggyorg/graphify": "^0.1.10",
-    "@buggyorg/graphlib2kgraph": "^0.1.4",
+    "@buggyorg/graphlib2kgraph": "^0.1.6",
     "@buggyorg/npg-port-remodeler": "^0.1.8",
     "@buggyorg/resolve": "^0.1.12",
     "@buggyorg/typify": "^0.1.0",
