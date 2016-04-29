@@ -30,7 +30,7 @@ if (process.env.BUGGY_COMPONENT_LIBRARY_HOST) {
 }
 
 program
-  .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json'))['version'])
+  .version(JSON.parse(fs.readFileSync(path.join(__dirname, '/../package.json')))['version'])
   .option('-e, --elastic <host>', 'The elastic server to connect to.' + defaultElastic, String, server)
   .parse(process.argv)
 
