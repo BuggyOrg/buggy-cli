@@ -23,12 +23,13 @@
     "standard": "^6.0.8"
   },
   "dependencies": {
+    "@buggyorg/checker": "^0.1.2",
     "@buggyorg/component-library": "^0.3.1",
     "@buggyorg/dupjoin": "^0.1.4",
     "@buggyorg/dynatype-network-graph": "^0.1.4",
     "@buggyorg/functional": "^0.1.0",
     "@buggyorg/gogen": "^0.1.4",
-    "@buggyorg/graphify": "^0.1.10",
+    "@buggyorg/graphify": "^0.1.12",
     "@buggyorg/graphlib2kgraph": "^0.1.6",
     "@buggyorg/npg-port-remodeler": "^0.1.8",
     "@buggyorg/resolve": "^0.1.12",
