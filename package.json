@@ -38,6 +38,7 @@
     "commander": "^2.9.0",
     "get-stdin": "^5.0.1",
     "graphlib": "^2.1.0",
+    "open": "0.0.5",
     "promised-exec": "^1.0.1",
     "tempfile": "^1.1.1"
   }

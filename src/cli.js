@@ -18,6 +18,7 @@ import {resolveLambdaTypes} from '@buggyorg/functional'
 import promisedExec from 'promised-exec'
 import tempfile from 'tempfile'
 import path from 'path'
+import open from 'open'
 
 var server = ''
 var defaultElastic = ' Defaults to BUGGY_COMPONENT_LIBRARY_HOST'
@@ -65,11 +66,38 @@ program
       var f = tempfile('.json')
       fs.writeFileSync(f, JSON.stringify(res))
       // sadly the API call didn't work. Start the CLI variant
-      return promisedExec('node ' + path.join(__dirname, '../node_modules/@buggyorg/graphify/lib/cli.js') + ' "' + f + '"')
+      return promisedExec('node ' + path.join(__dirname, '../node_modules/@buggyorg/graphify/lib/cli.js') + ' -f "' + f + '"')
         // .then(() => { fs.unlinkSync(f) })
     })
     // .then((res) => kgraph2Svg(res))
     .then((res) => console.log(res))
+    .catch((err) => console.error(err.stack))
+  })
+
+program
+  .command('interactive <json>')
+  .option('-b, --bare', 'Do not resolve the graph file')
+  .description('Opens a browser window with an interactive version of the layouted graph')
+  .action((json, options) => {
+    console.log('interactive')
+    var client = lib(program.elastic)
+    var resPromise = null
+    if (options.bare) {
+      resPromise = Promise.resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))))
+    } else {
+      resPromise = resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    }
+    resPromise
+    .then((res) => check(res))
+    .then((res) => convertGraph(res))
+    .then((res) => {
+      console.log('creating new html file')
+      var htmlContent = fs.readFileSync('node_modules/@buggyorg/graphify/app/index.html', 'utf8')
+      var newContent = htmlContent.replace('<textarea id="txtInput"></textarea>', '<textarea id="txtInput">' + JSON.stringify(res, null, 2) + '</textarea>')
+      var tmpFile = 'node_modules/@buggyorg/graphify/app/index2.html'
+      fs.writeFileSync(tmpFile, newContent)
+      open(tmpFile)
+    })
     .catch((err) => console.error(err.stack))
   })
 
