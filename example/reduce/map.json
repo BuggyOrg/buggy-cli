@@ -23,7 +23,7 @@
     },
     {
       "v": "mapInc",
-      "value": {"meta": "functional/map", "version": "0.1.2"}
+      "value": {"meta": "functional/map", "version": "0.1.3"}
     },
     {
       "v": "arrToStr",
