@@ -79,7 +79,6 @@ program
   .option('-b, --bare', 'Do not resolve the graph file')
   .description('Opens a browser window with an interactive version of the layouted graph')
   .action((json, options) => {
-    console.log('interactive')
     var client = lib(program.elastic)
     var resPromise = null
     if (options.bare) {
@@ -91,7 +90,6 @@ program
     .then((res) => check(res))
     .then((res) => convertGraph(res))
     .then((res) => {
-      console.log('creating new html file')
       var htmlContent = fs.readFileSync('node_modules/@buggyorg/graphify/app/index.html', 'utf8')
       var newContent = htmlContent.replace('<textarea id="txtInput"></textarea>', '<textarea id="txtInput">' + JSON.stringify(res, null, 2) + '</textarea>')
       var tmpFile = 'node_modules/@buggyorg/graphify/app/index2.html'
