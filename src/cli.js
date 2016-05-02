@@ -90,9 +90,9 @@ program
     .then((res) => check(res))
     .then((res) => convertGraph(res))
     .then((res) => {
-      var htmlContent = fs.readFileSync('node_modules/@buggyorg/graphify/app/index.html', 'utf8')
+      var htmlContent = fs.readFileSync(path.join(__dirname, '../node_modules/@buggyorg/graphify/app/index.html'), 'utf8')
       var newContent = htmlContent.replace('<textarea id="txtInput"></textarea>', '<textarea id="txtInput">' + JSON.stringify(res, null, 2) + '</textarea>')
-      var tmpFile = 'node_modules/@buggyorg/graphify/app/index2.html'
+      var tmpFile = path.join(__dirname, '../node_modules/@buggyorg/graphify/app/index2.html')
       fs.writeFileSync(tmpFile, newContent)
       open(tmpFile)
     })
