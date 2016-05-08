@@ -134,6 +134,26 @@ program
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
     .then((res) => remodelPorts(res))
+    .then((res) => replaceGenerics(res))
+    .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
+    .catch((err) => {
+      console.error('error while transpiling')
+      console.error(err.stack)
+    })
+  })
+
+program
+  .command('ng-wg <json>')
+  .option('-o, --output <outputFile>', 'The output filename to generate')
+  .description('Compile a program description into a program using a specific language.')
+  .action((json, options) => {
+    var client = lib(program.elastic)
+    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    .then((res) => check(res))
+    .then((res) => normalize(res))
+    .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
+    .then((res) => resolveLambdaTypes(res))
+    .then((res) => remodelPorts(res))
     /* .then((res) => replaceGenerics(res))*/
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
     .catch((err) => {
