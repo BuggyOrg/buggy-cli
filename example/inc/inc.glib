@@ -7,15 +7,15 @@
   "nodes": [
     {
       "v": "in",
-      "value": {"meta": "io/stdin", "version": "0.1.0"}
+      "value": {"meta": "io/stdin", "version": "0.2.0"}
     },
     {
       "v": "inc",
-      "value": {"meta": "math/inc", "version": "0.2.0", "name": "inc"}
+      "value": {"meta": "math/inc", "version": "0.3.0"}
     },
     {
       "v": "out",
-      "value": {"meta": "io/stdout", "version": "0.1.0", "name": "out"}
+      "value": {"meta": "io/stdout", "version": "0.2.0"}
     }
   ],
   "edges": [
@@ -23,7 +23,7 @@
       "v": "in",
       "w": "inc",
       "value": {
-        "outPort": "stdin/input",
+        "outPort": "output",
         "inPort": "i"
       }
     },
@@ -32,7 +32,7 @@
       "w": "out",
       "value": {
         "outPort": "inc",
-        "inPort": "stdout/output"
+        "inPort": "input"
       }
     }
   ]
