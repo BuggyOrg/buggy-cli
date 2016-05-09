@@ -1,13 +1,13 @@
 {
   "name": "@buggyorg/buggy",
-  "version": "0.1.0",
+  "version": "0.1.7",
   "description": "Rich code generation system.",
-  "main": "api.js",
+  "main": "./lib/api.js",
   "bin": {
-    "buggy": "cli.js"
+    "buggy": "./lib/cli.js"
   },
   "scripts": {
-    "test": "node node_modules/standard/bin/cmd.js src/**/*.js && babel src -d lib && node_modules/mocha/bin/mocha --compilers js:babel/register",
+    "test": "node node_modules/standard/bin/cmd.js src/**/*.js && echo no tests",
     "build": "babel src -d lib",
     "prepublish": "babel src -d lib"
   },
@@ -20,18 +20,26 @@
     "babel-cli": "^6.6.5",
     "babel-preset-es2015": "^6.3.13",
     "babel-register": "^6.3.13",
-    "standard": "^5.4.1"
+    "standard": "^6.0.8"
   },
   "dependencies": {
+    "@buggyorg/checker": "^0.1.2",
     "@buggyorg/component-library": "^0.3.1",
     "@buggyorg/dupjoin": "^0.1.4",
-    "@buggyorg/dynatype-network-graph": "^0.1.4",
+    "@buggyorg/dynatype-network-graph": "^0.1.6",
     "@buggyorg/functional": "^0.1.0",
     "@buggyorg/gogen": "^0.1.4",
+    "@buggyorg/graphify": "^0.1.12",
+    "@buggyorg/graphlib2kgraph": "^0.1.6",
     "@buggyorg/npg-port-remodeler": "^0.1.8",
-    "@buggyorg/resolve": "^0.1.9",
+    "@buggyorg/resolve": "^0.1.12",
     "@buggyorg/typify": "^0.1.0",
+    "babel-polyfill": "^6.7.4",
     "commander": "^2.9.0",
-    "graphlib": "^2.1.0"
+    "get-stdin": "^5.0.1",
+    "graphlib": "^2.1.0",
+    "open": "0.0.5",
+    "promised-exec": "^1.0.1",
+    "tempfile": "^1.1.1"
   }
 }

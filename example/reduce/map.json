@@ -1,0 +1,79 @@
+{
+  "options": {
+    "directed": true,
+    "multigraph": true,
+    "compound": true
+  },
+  "nodes": [
+    {
+      "v": "in",
+      "value": {"meta": "io/stdin", "version": "0.2.0"}
+    },
+    {
+      "v": "lambda_inc",
+      "value": {"meta": "functional/lambda", "version": "0.1.0", "params": {"implementation": "math/inc"}}
+    },
+    {
+      "v": "inc_lambda",
+      "value": {"meta": "math/inc", "version": "0.4.1"}
+    },
+    {
+      "v": "strToArr",
+      "value": {"meta": "translator/string_to_array", "version": "0.1.0", "typeHint": {"output": "[number]"}}
+    },
+    {
+      "v": "mapInc",
+      "value": {"meta": "functional/map", "version": "0.2.2"}
+    },
+    {
+      "v": "arrToStr",
+      "value": {"meta": "translator/array_to_string", "version": "0.1.0"}
+    },
+    {
+      "v": "out",
+      "value": {"meta": "io/stdout", "version": "0.2.0"}
+    }
+  ],
+  "edges": [
+    {
+      "v": "in",
+      "w": "strToArr",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "strToArr",
+      "w": "mapInc",
+      "value": {
+        "outPort": "output",
+        "inPort": "data"
+      }
+    },
+    {
+      "v": "lambda_inc",
+      "w": "mapInc",
+      "value": {
+        "outPort": "fn",
+        "inPort": "fn"
+      }
+    },
+    {
+      "v": "mapInc",
+      "w": "arrToStr",
+      "value": {
+        "outPort": "result",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "arrToStr",
+      "w": "out",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    }
+  ]
+}
