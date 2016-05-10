@@ -13,7 +13,7 @@ import {convertGraph} from '@buggyorg/graphlib2kgraph'
 import {check} from '@buggyorg/checker'
 import graphlib from 'graphlib'
 import gogen from '@buggyorg/gogen'
-import {replaceGenerics} from '@buggyorg/dynatype-network-graph'
+import {replaceGenerics, isGenericFree} from '@buggyorg/dynatype-network-graph'
 import {resolveLambdaTypes} from '@buggyorg/functional'
 import promisedExec from 'promised-exec'
 import tempfile from 'tempfile'
@@ -112,6 +112,12 @@ program
     .then((res) => resolveLambdaTypes(res))
     .then((res) => remodelPorts(res))
     .then((res) => replaceGenerics(res))
+    .then((res) => {
+      if (!isGenericFree(res)) {
+        throw new Error('Unable to resolve all generic types')
+      }
+      return res
+    })
     .then((res) => gogen.preprocess(res))
     .then((res) => gogen.generateCode(res))
 //    .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
