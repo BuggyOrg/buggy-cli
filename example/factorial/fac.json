@@ -14,16 +14,8 @@
       "value": {"meta": "translator/string_to_number", "version": "0.1.0"}
     },
     {
-      "v": "lambda_inc",
-      "value": {"meta": "functional/lambda", "version": "0.1.0", "params": {"implementation": "math/inc"}}
-    },
-    {
-      "v": "inc_lambda",
-      "value": {"meta": "math/inc", "version": "0.4.1"}
-    },
-    {
-      "v": "apply",
-      "value": {"meta": "functional/apply", "version": "0.1.1"}
+      "v": "fac",
+      "value": {"meta": "math/factorial", "version": "0.2.1"}
     },
     {
       "v": "numToStr",
@@ -45,25 +37,17 @@
     },
     {
       "v": "strToNum",
-      "w": "apply",
+      "w": "fac",
       "value": {
         "outPort": "output",
-        "inPort": "value"
+        "inPort": "n"
       }
     },
     {
-      "v": "lambda_inc",
-      "w": "apply",
-      "value": {
-        "outPort": "fn",
-        "inPort": "fn"
-      }
-    },
-    {
-      "v": "apply",
+      "v": "fac",
       "w": "numToStr",
       "value": {
-        "outPort": "result",
+        "outPort": "fac",
         "inPort": "input"
       }
     },

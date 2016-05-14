@@ -138,9 +138,9 @@ program
     .then((res) => check(res))
     .then((res) => normalize(res))
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
-    .then((res) => resolveLambdaTypes(res))
+    /* .then((res) => resolveLambdaTypes(res))
     .then((res) => remodelPorts(res))
-    .then((res) => replaceGenerics(res))
+    .then((res) => replaceGenerics(res))*/
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
     .catch((err) => {
       console.error('error while transpiling')
