@@ -7,7 +7,7 @@
     "buggy": "./lib/cli.js"
   },
   "scripts": {
-    "test": "node node_modules/standard/bin/cmd.js src/**/*.js && mocha --compilers js:babel-register --timeout 20000",
+    "test": "node node_modules/standard/bin/cmd.js src/**/*.js && babel src -d lib && mocha --compilers js:babel-register --timeout 20000",
     "build": "babel src -d lib",
     "prepublish": "babel src -d lib"
   },
@@ -29,14 +29,15 @@
   "dependencies": {
     "@buggyorg/checker": "^0.1.2",
     "@buggyorg/component-library": "^0.3.1",
-    "@buggyorg/dupjoin": "^0.1.6",
-    "@buggyorg/dynatype-network-graph": "^0.1.8",
+    "@buggyorg/dupjoin": "^0.1.8",
+    "@buggyorg/dynatype-network-graph": "^0.1.10",
     "@buggyorg/functional": "^0.1.2",
-    "@buggyorg/gogen": "^0.1.6",
-    "@buggyorg/graphify": "^0.1.12",
+    "@buggyorg/gogen": "^0.2.0",
+    "@buggyorg/graphify": "^0.1.14",
     "@buggyorg/graphlib2kgraph": "^0.1.6",
-    "@buggyorg/npg-port-remodeler": "^0.1.8",
-    "@buggyorg/resolve": "^0.1.18",
+    "@buggyorg/muxcontinuations": "^0.1.1",
+    "@buggyorg/npg-port-remodeler": "^0.1.10",
+    "@buggyorg/resolve": "^0.1.19",
     "@buggyorg/typify": "^0.1.0",
     "babel-polyfill": "^6.7.4",
     "commander": "^2.9.0",

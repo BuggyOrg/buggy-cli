@@ -77,4 +77,35 @@ describe('Buggy CLI', () => {
     return runCompiled('example/reduce/map.json', '1,2,3,2,5,1')
       .then((fac) => expect(JSON.parse('[' + fac + ']')).to.deep.equal([2, 3, 4, 3, 6, 2]))
   })
+
+  it('Compiles and runs a program with a multiplexer', () => {
+    return expect(runCompiled('example/mux.json')).to.be.fulfilled
+  })
+
+  it('Creates a correct multiplexer program', () => {
+    return runCompiled('example/mux.json', '1')
+      .then((res) => expect(res).to.equal('4'))
+      .then(() => runCompiled('example/mux.json', '77'))
+      .then((res) => expect(res).to.equal('2'))
+  })
+
+  it('Compiles and runs a program with a multiplexer that controls a recursion', () => {
+    return expect(runCompiled('example/factorial/factorial.json')).to.be.fulfilled
+  })
+
+  it('Creates a correct program with a multiplexer that controls a recursion', () => {
+    return runCompiled('example/factorial/factorial.json', '3')
+      .then((res) => expect(res).to.equal('6'))
+      .then(() => runCompiled('example/factorial/factorial.json', '6'))
+      .then((res) => expect(res).to.equal('720'))
+  })
+
+  it('Compiles and runs the ackermann programm', () => {
+    return expect(runCompiled('example/ack.json')).to.be.fulfilled
+  })
+
+  it('Creates a correct program with a multiplexer that controls a recursion', () => {
+    return runCompiled('example/ack.json', '3')
+      .then((res) => expect(res).to.equal('61'))
+  })
 })
