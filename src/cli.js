@@ -9,11 +9,12 @@ import {remodelPorts} from '@buggyorg/npg-port-remodeler'
 import {normalize} from '@buggyorg/dupjoin'
 import {applyTypings} from '@buggyorg/typify'
 import {convertGraph} from '@buggyorg/graphlib2kgraph'
+import addContinuations from '@buggyorg/muxcontinuations'
 // import kgraph2Svg from '@buggyorg/graphify'
 import {check} from '@buggyorg/checker'
 import graphlib from 'graphlib'
 import gogen from '@buggyorg/gogen'
-import {replaceGenerics, isGenericFree} from '@buggyorg/dynatype-network-graph'
+import {replaceGenerics, isGenericFree, genericNodes} from '@buggyorg/dynatype-network-graph'
 import {resolveLambdaTypes} from '@buggyorg/functional'
 import promisedExec from 'promised-exec'
 import tempfile from 'tempfile'
@@ -87,7 +88,16 @@ program
       resPromise = resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
     }
     resPromise
-    .then((res) => check(res))
+    .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
+    .then((res) => resolveLambdaTypes(res))
+    .then((res) => replaceGenerics(res))
+    .then((res) => {
+      if (!isGenericFree(res)) {
+        throw new Error('Unable to resolve all generic types. Remaining nodes with generics:' + genericNodes(res))
+      }
+      return res
+    })
+    .then((res) => normalize(res))
     .then((res) => convertGraph(res))
     .then((res) => {
       var htmlContent = fs.readFileSync(path.join(__dirname, '../node_modules/@buggyorg/graphify/app/index.html'), 'utf8')
@@ -107,17 +117,18 @@ program
     var client = lib(program.elastic)
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
     .then((res) => check(res))
+    .then((res) => addContinuations(res))
     .then((res) => normalize(res))
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
-    .then((res) => remodelPorts(res))
     .then((res) => replaceGenerics(res))
     .then((res) => {
       if (!isGenericFree(res)) {
-        throw new Error('Unable to resolve all generic types')
+        throw new Error('Unable to resolve all generic types. Remaining nodes with generics:' + genericNodes(res))
       }
       return res
     })
+    .then((res) => remodelPorts(res))
     .then((res) => gogen.preprocess(res))
     .then((res) => gogen.generateCode(res))
 //    .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
@@ -136,6 +147,7 @@ program
     var client = lib(program.elastic)
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
     .then((res) => check(res))
+    .then((res) => addContinuations(res))
     .then((res) => normalize(res))
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
@@ -156,11 +168,12 @@ program
     var client = lib(program.elastic)
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
     .then((res) => check(res))
+    .then((res) => addContinuations(res))
     .then((res) => normalize(res))
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
     .then((res) => remodelPorts(res))
-    /* .then((res) => replaceGenerics(res))*/
+    .then((res) => replaceGenerics(res))
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
     .catch((err) => {
       console.error('error while transpiling')
@@ -176,6 +189,7 @@ program
     var client = lib(program.elastic)
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
     .then((res) => check(res))
+    .then((res) => addContinuations(res))
     .then((res) => normalize(res))
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
     .catch((err) => console.error(err.stack))
