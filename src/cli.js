@@ -97,7 +97,7 @@ program
       }
       return res
     })
-    .then((res) => normalize(res))
+    // .then((res) => normalize(res))
     .then((res) => convertGraph(res))
     .then((res) => {
       var htmlContent = fs.readFileSync(path.join(__dirname, '../node_modules/@buggyorg/graphify/app/index.html'), 'utf8')
@@ -117,8 +117,6 @@ program
     var client = lib(program.elastic)
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
     .then((res) => check(res))
-    .then((res) => addContinuations(res))
-    .then((res) => normalize(res))
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
     .then((res) => replaceGenerics(res))
@@ -128,6 +126,8 @@ program
       }
       return res
     })
+    .then((res) => addContinuations(res))
+    .then((res) => normalize(res))
     .then((res) => remodelPorts(res))
     .then((res) => gogen.preprocess(res))
     .then((res) => gogen.generateCode(res))
