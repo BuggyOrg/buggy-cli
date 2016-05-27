@@ -78,6 +78,7 @@ program
 program
   .command('interactive <json>')
   .option('-b, --bare', 'Do not resolve the graph file')
+  .option('-t, --types', 'Resolve types in graph')
   .description('Opens a browser window with an interactive version of the layouted graph')
   .action((json, options) => {
     var client = lib(program.elastic)
@@ -87,17 +88,19 @@ program
     } else {
       resPromise = resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
     }
+    if (options.types) {
+      resPromise = resPromise
+      .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
+      .then((res) => resolveLambdaTypes(res))
+      .then((res) => replaceGenerics(res))
+      .then((res) => {
+        if (!isGenericFree(res)) {
+          throw new Error('Unable to resolve all generic types. Remaining nodes with generics:' + genericNodes(res))
+        }
+        return res
+      })
+    }
     resPromise
-    .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
-    .then((res) => resolveLambdaTypes(res))
-    .then((res) => replaceGenerics(res))
-    .then((res) => {
-      if (!isGenericFree(res)) {
-        throw new Error('Unable to resolve all generic types. Remaining nodes with generics:' + genericNodes(res))
-      }
-      return res
-    })
-    // .then((res) => normalize(res))
     .then((res) => convertGraph(res))
     .then((res) => {
       var htmlContent = fs.readFileSync(path.join(__dirname, '../node_modules/@buggyorg/graphify/app/index.html'), 'utf8')
