@@ -147,12 +147,18 @@ program
     var client = lib(program.elastic)
     resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
     .then((res) => check(res))
-    .then((res) => addContinuations(res))
-    .then((res) => normalize(res))
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
-    .then((res) => remodelPorts(res))
     .then((res) => replaceGenerics(res))
+    .then((res) => {
+      if (!isGenericFree(res)) {
+        throw new Error('Unable to resolve all generic types. Remaining nodes with generics:' + genericNodes(res))
+      }
+      return res
+    })
+    .then((res) => addContinuations(res))
+    .then((res) => normalize(res))
+    .then((res) => remodelPorts(res))
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
     .catch((err) => {
       console.error('error while transpiling')

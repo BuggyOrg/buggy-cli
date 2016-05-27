@@ -108,4 +108,13 @@ describe('Buggy CLI', () => {
     return runCompiled('example/ack.json', '3')
       .then((res) => expect(res).to.equal('61'))
   })
+
+  it('Compiles and runs the filter through fold program', () => {
+    return expect(runCompiled('example/reduce/functional.json')).to.be.fulfilled
+  })
+
+  it('Creates a correct filter through fold program', () => {
+    return runCompiled('example/reduce/functional.json', '3,11,4,22,6,5')
+      .then((fac) => expect(JSON.parse('[' + fac + ']')).to.deep.equal([5, 6, 4, 3]))
+  })
 })
