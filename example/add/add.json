@@ -15,7 +15,7 @@
     },
     {
       "v": "const",
-      "value": {"meta": "math/const", "version": "0.1.0", "params": {
+      "value": {"meta": "math/const", "version": "0.2.0", "params": {
         "value": 17
         }}
     },
