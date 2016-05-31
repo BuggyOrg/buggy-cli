@@ -9,7 +9,7 @@
 (defco filter [list fn]
   (fold list (functional/partial 0 (lambda (fn acc cur)
     (logic/mux
-      (array/append acc cur)
+      (array/prepend acc cur)
       acc
       (functional/apply fn cur))) fn) []))
 

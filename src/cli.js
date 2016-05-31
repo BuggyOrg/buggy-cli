@@ -14,7 +14,7 @@ import addContinuations from '@buggyorg/muxcontinuations'
 import {check} from '@buggyorg/checker'
 import graphlib from 'graphlib'
 import gogen from '@buggyorg/gogen'
-import {replaceGenerics, isGenericFree, genericNodes} from '@buggyorg/dynatype-network-graph'
+import {replaceGenerics, isGenericFree, genericNodes} from '@buggyorg/generics'
 import {resolveLambdaTypes} from '@buggyorg/functional'
 import promisedExec from 'promised-exec'
 import tempfile from 'tempfile'
@@ -95,7 +95,7 @@ program
       .then((res) => replaceGenerics(res))
       .then((res) => {
         if (!isGenericFree(res)) {
-          throw new Error('Unable to resolve all generic types. Remaining nodes with generics:' + genericNodes(res))
+          console.error('Unable to resolve all generic types. Remaining nodes with generics:' + genericNodes(res))
         }
         return res
       })
