@@ -115,6 +115,15 @@ describe('Buggy CLI', () => {
 
   it('Creates a correct filter through fold program', () => {
     return runCompiled('example/reduce/functional.json', '3,11,4,22,6,5')
-      .then((fac) => expect(JSON.parse('[' + fac + ']')).to.deep.equal([5, 6, 4, 3]))
+      .then((fac) => expect(JSON.parse('[' + fac + ']')).to.deep.equal([3, 4, 6, 5]))
+  })
+
+  it('Compiles and runs the quicksort programm', () => {
+    return expect(runCompiled('example/sort/quicksort.json')).to.be.fulfilled
+  })
+
+  it('Creates a correct quicksort program', () => {
+    return runCompiled('example/sort/quicksort.json', '3,11,4,22,6,5')
+      .then((qsort) => expect(JSON.parse('[' + qsort + ']')).to.deep.equal([3, 4, 5, 6, 11, 22]))
   })
 })

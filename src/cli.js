@@ -79,6 +79,8 @@ program
   .command('interactive <json>')
   .option('-b, --bare', 'Do not resolve the graph file')
   .option('-t, --types', 'Resolve types in graph')
+  .option('-c, --cancle', 'Cancle before starting browser session. [debug mode]')
+  .option('-m, --mux', 'Calculate mux continuations. Only when `--types` is enabled')
   .description('Opens a browser window with an interactive version of the layouted graph')
   .action((json, options) => {
     var client = lib(program.elastic)
@@ -99,6 +101,13 @@ program
         }
         return res
       })
+      if (options.mux) {
+        // resPromise = resPromise.then((res) => { console.error(JSON.stringify(graphlib.json.write(res))); return res })
+        resPromise = resPromise.then((res) => addContinuations(res))
+      }
+    }
+    if (options.cancle) {
+      resPromise = resPromise.then(() => process.exit(1))
     }
     resPromise
     .then((res) => convertGraph(res))
