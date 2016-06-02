@@ -10,6 +10,7 @@ import {normalize} from '@buggyorg/dupjoin'
 import {applyTypings} from '@buggyorg/typify'
 import {convertGraph} from '@buggyorg/graphlib2kgraph'
 import addContinuations from '@buggyorg/muxcontinuations'
+import {parse_to_json} from '@buggyorg/lisgy'
 // import kgraph2Svg from '@buggyorg/graphify'
 import {check} from '@buggyorg/checker'
 import graphlib from 'graphlib'
@@ -32,6 +33,18 @@ if (process.env.BUGGY_COMPONENT_LIBRARY_HOST) {
   defaultElastic += ' or if not set to http://localhost:9200'
 }
 
+const getInputJson = (file) => {
+  var resPromise = Promise.resolve(fs.readFileSync(file, 'utf8'))
+  if (path.extname(file) === '.clj') {
+    resPromise = resPromise
+      .then((res) => parse_to_json(res, true))
+      .then((res) => graphlib.json.read(res))
+  } else {
+    resPromise = resPromise.then((res) => graphlib.json.read(JSON.parse(res)))
+  }
+  return resPromise
+}
+
 program
   .version(JSON.parse(fs.readFileSync(path.join(__dirname, '/../package.json')))['version'])
   .option('-e, --elastic <host>', 'The elastic server to connect to.' + defaultElastic, String, server)
@@ -43,7 +56,8 @@ program
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
     var client = lib(program.elastic)
-    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    getInputJson(json)
+    .then((res) => resolve(res, client.get))
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
     .catch((err) => console.error(err.stack))
   })
@@ -54,7 +68,7 @@ program
   .description('Create a SVG flow chart diagram for the given json file.')
   .action((json, options) => {
     var client = lib(program.elastic)
-    var resPromise = null
+    var resPromise = getInputJson(json)
     if (options.bare) {
       resPromise = Promise.resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))))
     } else {
@@ -84,11 +98,9 @@ program
   .description('Opens a browser window with an interactive version of the layouted graph')
   .action((json, options) => {
     var client = lib(program.elastic)
-    var resPromise = null
-    if (options.bare) {
-      resPromise = Promise.resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))))
-    } else {
-      resPromise = resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    var resPromise = getInputJson(json)
+    if (!options.bare) {
+      resPromise = resPromise.then((res) => resolve(res, client.get))
     }
     if (options.types) {
       resPromise = resPromise
@@ -122,12 +134,13 @@ program
   })
 
 program
-  .command('compile <json> <language>')
+  .command('compile <input> <language>')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
   .action((json, language, options) => {
     var client = lib(program.elastic)
-    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    getInputJson(json)
+    .then((res) => resolve(res, client.get))
     .then((res) => check(res))
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
@@ -157,7 +170,8 @@ program
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
     var client = lib(program.elastic)
-    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    getInputJson(json)
+    .then((res) => resolve(res, client.get))
     .then((res) => check(res))
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
@@ -184,7 +198,8 @@ program
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
     var client = lib(program.elastic)
-    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    getInputJson(json)
+    .then((res) => resolve(res, client.get))
     .then((res) => check(res))
     .then((res) => addContinuations(res))
     .then((res) => normalize(res))
@@ -205,7 +220,8 @@ program
   .description('Compile a program description into a program using a specific language.')
   .action((json, language, options) => {
     var client = lib(program.elastic)
-    resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))), client.get)
+    getInputJson(json)
+    .then((res) => resolve(res, client.get))
     .then((res) => check(res))
     .then((res) => addContinuations(res))
     .then((res) => normalize(res))
