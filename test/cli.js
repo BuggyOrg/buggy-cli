@@ -126,4 +126,13 @@ describe('Buggy CLI', () => {
     return runCompiled('example/sort/quicksort.json', '3,11,4,22,6,5')
       .then((qsort) => expect(JSON.parse('[' + qsort + ']')).to.deep.equal([3, 4, 5, 6, 11, 22]))
   })
+
+  it('Compiles and runs the selection sort programm', () => {
+    return expect(runCompiled('example/sort/selectionsort.clj')).to.be.fulfilled
+  })
+
+  it('Creates a correct selectionsort program', () => {
+    return runCompiled('example/sort/selectionsort.clj', '3,11,4,22,6,5')
+      .then((qsort) => expect(JSON.parse('[' + qsort + ']')).to.deep.equal([3, 4, 5, 6, 11, 22]))
+  })
 })
