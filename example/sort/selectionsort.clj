@@ -27,7 +27,7 @@
     list
     (let [m (min list)]
       (array/prepend (selectionsort (filter list 
-        (functional/partial 0 (lambda (x y) (logic/equal x y)) m))) m))
+        (functional/partial 0 (lambda (x y) (logic/not (logic/equal x y))) m))) m))
     (array/empty list)))
 
 (io/stdout (translator/array_to_string (selectionsort (translator/string_to_array (io/stdin)))))
