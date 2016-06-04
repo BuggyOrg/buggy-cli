@@ -12,6 +12,7 @@ import {convertGraph} from '@buggyorg/graphlib2kgraph'
 import addContinuations from '@buggyorg/muxcontinuations'
 import {parse_to_json} from '@buggyorg/lisgy'
 // import kgraph2Svg from '@buggyorg/graphify'
+import {graphToWebsite} from '@buggyorg/graphify'
 import {check} from '@buggyorg/checker'
 import graphlib from 'graphlib'
 import gogen from '@buggyorg/gogen'
@@ -134,11 +135,10 @@ program
     }
     resPromise
     .then((res) => convertGraph(res))
-    .then((res) => {
-      var htmlContent = fs.readFileSync(path.join(__dirname, '../node_modules/@buggyorg/graphify/app/index.html'), 'utf8')
-      var newContent = htmlContent.replace('<textarea id="txtInput"></textarea>', '<textarea id="txtInput">' + JSON.stringify(res, null, 2) + '</textarea>')
-      var tmpFile = path.join(__dirname, '../node_modules/@buggyorg/graphify/app/index2.html')
-      fs.writeFileSync(tmpFile, newContent)
+    .then((graph) => graphToWebsite(graph))
+    .then((html) => {
+      const tmpFile = tempfile('.html')
+      fs.writeFileSync(tmpFile, html)
       open(tmpFile)
     })
     .catch((err) => console.error(err.stack))
