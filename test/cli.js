@@ -144,4 +144,13 @@ describe('Buggy CLI', () => {
     return runCompiled('example/sort/insertionsort.clj', '3,11,4,22,6,5')
       .then((qsort) => expect(JSON.parse('[' + qsort + ']')).to.deep.equal([3, 4, 5, 6, 11, 22]))
   })
+
+  it('Compiles and runs the lambda-call programm', () => {
+    return expect(runCompiled('example/sort/lambda.call.clj')).to.be.fulfilled
+  })
+
+  it('Creates a correct lambda-call program', () => {
+    return runCompiled('example/lambda/lambda.call.clj', '')
+      .then((res) => expect(res).to.deep.equal('3'))
+  })
 })
