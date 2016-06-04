@@ -51,6 +51,16 @@ program
   .parse(process.argv)
 
 program
+  .command('json <json>')
+  .option('-o, --output <outputFile>', 'The output filename to generate')
+  .description('Compile a program description into a program using a specific language.')
+  .action((json, options) => {
+    getInputJson(json)
+    .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
+    .catch((err) => console.error(err.stack))
+  })
+
+program
   .command('resolve <json>')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
@@ -93,6 +103,7 @@ program
   .command('interactive <json>')
   .option('-b, --bare', 'Do not resolve the graph file')
   .option('-t, --types', 'Resolve types in graph')
+  .option('-s, --steps <n>', 'Maximum number of steps for resolving generics (only works with t). [debug mode]')
   .option('-c, --cancle', 'Cancle before starting browser session. [debug mode]')
   .option('-m, --mux', 'Calculate mux continuations. Only when `--types` is enabled')
   .description('Opens a browser window with an interactive version of the layouted graph')
@@ -106,7 +117,7 @@ program
       resPromise = resPromise
       .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
       .then((res) => resolveLambdaTypes(res))
-      .then((res) => replaceGenerics(res))
+      .then((res) => replaceGenerics(res, options.steps))
       .then((res) => {
         if (!isGenericFree(res)) {
           console.error('Unable to resolve all generic types. Remaining nodes with generics:' + genericNodes(res))
