@@ -1,6 +1,6 @@
 {
   "name": "@buggyorg/buggy",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "Rich code generation system.",
   "main": "./lib/api.js",
   "bin": {
@@ -33,7 +33,6 @@
     "@buggyorg/dynatype-network-graph": "^0.1.12",
     "@buggyorg/functional": "^0.1.5",
     "@buggyorg/generics": "^0.1.6",
-    "@buggyorg/gogen": "^0.2.5",
     "@buggyorg/gogen": "^0.2.6",
     "@buggyorg/graphify": "^0.1.18",
     "@buggyorg/graphlib2kgraph": "^0.1.9",
