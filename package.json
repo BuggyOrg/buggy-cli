@@ -32,7 +32,7 @@
     "@buggyorg/dupjoin": "^0.1.11",
     "@buggyorg/dynatype-network-graph": "^0.1.12",
     "@buggyorg/functional": "^0.1.5",
-    "@buggyorg/generics": "^0.1.6",
+    "@buggyorg/generics": "^0.1.7",
     "@buggyorg/gogen": "^0.2.6",
     "@buggyorg/graphify": "^0.1.18",
     "@buggyorg/graphlib2kgraph": "^0.1.9",
