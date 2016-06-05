@@ -36,7 +36,7 @@
     },
     {
       "v": "apply",
-      "value": {"meta": "functional/apply", "version": "0.1.2"}
+      "value": {"meta": "functional/apply", "version": "0.2.0"}
     },
     {
       "v": "numToStr",

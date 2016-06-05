@@ -104,7 +104,7 @@ describe('Buggy CLI', () => {
     return expect(runCompiled('example/ack.json')).to.be.fulfilled
   })
 
-  it('Creates a correct program with a multiplexer that controls a recursion', () => {
+  it('Creates a correct ackermann programm', () => {
     return runCompiled('example/ack.json', '3')
       .then((res) => expect(res).to.equal('61'))
   })
@@ -146,11 +146,11 @@ describe('Buggy CLI', () => {
   })
 
   it('Compiles and runs the lambda-call programm', () => {
-    return expect(runCompiled('example/sort/lambda.call.clj')).to.be.fulfilled
+    return expect(runCompiled('example/lambda/lambda.call.clj')).to.be.fulfilled
   })
 
   it('Creates a correct lambda-call program', () => {
-    return runCompiled('example/lambda/lambda.call.clj', '')
+    return runCompiled('example/lambda/lambda.call.clj', '2')
       .then((res) => expect(res).to.deep.equal('3'))
   })
 })
