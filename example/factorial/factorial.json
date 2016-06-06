@@ -1,0 +1,171 @@
+{
+  "code": "(defco factorial (n)\n  (:fac (logic/mux\n    1\n    (math/multiply n (factorial (math/add n -1)))\n    (math/less n 1))))\n\n(io/stdout (translator/number_to_string (factorial (translator/string_to_number (io/stdin)))))",
+  "nodes": [
+    {
+      "v": "stdout_8",
+      "value": {
+        "meta": "io/stdout",
+        "name": "stdout_8"
+      }
+    },
+    {
+      "v": "number_to_string_9",
+      "value": {
+        "meta": "translator/number_to_string",
+        "name": "number_to_string_9"
+      }
+    },
+    {
+      "v": "factorial_10",
+      "value": {
+        "id": "factorial",
+        "inputPorts": {
+          "n": "generic"
+        },
+        "outputPorts": {
+          "fac": "generic"
+        },
+        "implementation": {
+          "nodes": [
+            {
+              "meta": "logic/mux",
+              "name": "mux_0"
+            },
+            {
+              "meta": "math/const",
+              "name": "const(1)_1",
+              "params": {
+                "value": 1
+              }
+            },
+            {
+              "meta": "math/multiply",
+              "name": "multiply_2"
+            },
+            {
+              "meta": "factorial",
+              "name": "factorial_3"
+            },
+            {
+              "meta": "math/add",
+              "name": "add_4"
+            },
+            {
+              "meta": "math/const",
+              "name": "const(-1)_5",
+              "params": {
+                "value": -1
+              }
+            },
+            {
+              "meta": "math/less",
+              "name": "less_6"
+            },
+            {
+              "meta": "math/const",
+              "name": "const(1)_7",
+              "params": {
+                "value": 1
+              }
+            }
+          ],
+          "edges": [
+            {
+              "from": "const(1)_1:output",
+              "to": "mux_0:input1"
+            },
+            {
+              "from": "n",
+              "to": "multiply_2:m1"
+            },
+            {
+              "from": "n",
+              "to": "add_4:s1"
+            },
+            {
+              "from": "const(-1)_5:output",
+              "to": "add_4:s2"
+            },
+            {
+              "from": "add_4:sum",
+              "to": "factorial_3:n"
+            },
+            {
+              "from": "factorial_3:fac",
+              "to": "multiply_2:m2"
+            },
+            {
+              "from": "multiply_2:product",
+              "to": "mux_0:input2"
+            },
+            {
+              "from": "n",
+              "to": "less_6:isLess"
+            },
+            {
+              "from": "const(1)_7:output",
+              "to": "less_6:than"
+            },
+            {
+              "from": "less_6:value",
+              "to": "mux_0:control"
+            },
+            {
+              "from": "mux_0:output",
+              "to": "fac"
+            }
+          ]
+        },
+        "name": "factorial_10"
+      }
+    },
+    {
+      "v": "string_to_number_11",
+      "value": {
+        "meta": "translator/string_to_number",
+        "name": "string_to_number_11"
+      }
+    },
+    {
+      "v": "stdin_12",
+      "value": {
+        "meta": "io/stdin",
+        "name": "stdin_12"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "v": "stdin_12",
+      "w": "string_to_number_11",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "string_to_number_11",
+      "w": "factorial_10",
+      "value": {
+        "outPort": "output",
+        "inPort": "n"
+      }
+    },
+    {
+      "v": "factorial_10",
+      "w": "number_to_string_9",
+      "value": {
+        "outPort": "fac",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "number_to_string_9",
+      "w": "stdout_8",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    }
+  ]
+}

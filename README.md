@@ -7,7 +7,7 @@ This package includes a CLI for the Buggy tool chain.
 A program in Buggy can take up various different forms depending on the position in the
 tool chain. The following pictures illustrates the different layers.
 
-![The Buggy toolchain with its layers](img/toolchain)
+![The Buggy toolchain with its layers](res/toolchain.png)
 
 # Command Line Interface
 

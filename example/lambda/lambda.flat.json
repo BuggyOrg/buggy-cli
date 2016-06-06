@@ -14,8 +14,29 @@
       "value": {"meta": "translator/string_to_number", "version": "0.1.0"}
     },
     {
-      "v": "fac",
-      "value": {"meta": "math/faculty", "version": "0.2.1"}
+      "v": "lambda_inc",
+      "value": {
+        "meta": "functional/lambda",
+        "data": {
+          "outputPorts": {
+            "inc": "generic"
+          },
+          "inputPorts": {
+            "i": "generic"
+          },
+          "implementation": {
+            "nodes": [{ "meta": "math/inc", "name": "incNode" }],
+            "edges": [
+              {"from": "i", "to": "incNode:i"},
+              {"from": "incNode:inc", "to": "inc"}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "v": "apply",
+      "value": {"meta": "functional/apply", "version": "0.2.0"}
     },
     {
       "v": "numToStr",
@@ -37,17 +58,25 @@
     },
     {
       "v": "strToNum",
-      "w": "fac",
+      "w": "apply",
       "value": {
         "outPort": "output",
-        "inPort": "n"
+        "inPort": "value"
       }
     },
     {
-      "v": "fac",
+      "v": "lambda_inc",
+      "w": "apply",
+      "value": {
+        "outPort": "fn",
+        "inPort": "fn"
+      }
+    },
+    {
+      "v": "apply",
       "w": "numToStr",
       "value": {
-        "outPort": "fac",
+        "outPort": "result",
         "inPort": "input"
       }
     },

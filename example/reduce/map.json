@@ -11,11 +11,24 @@
     },
     {
       "v": "lambda_inc",
-      "value": {"meta": "functional/lambda", "version": "0.1.0", "params": {"implementation": "math/inc"}}
-    },
-    {
-      "v": "inc_lambda",
-      "value": {"meta": "math/inc", "version": "0.4.1"}
+      "value": {
+        "meta": "functional/lambda",
+        "data": {
+          "outputPorts": {
+            "inc": "generic"
+          },
+          "inputPorts": {
+            "i": "generic"
+          },
+          "implementation": {
+            "nodes": [{ "meta": "math/inc", "name": "incNode" }],
+            "edges": [
+              {"from": "i", "to": "incNode:i"},
+              {"from": "incNode:inc", "to": "inc"}
+            ]
+          }
+        }
+      }
     },
     {
       "v": "strToArr",
@@ -23,7 +36,7 @@
     },
     {
       "v": "mapInc",
-      "value": {"meta": "functional/map", "version": "0.2.2"}
+      "value": {"meta": "functional/map", "version": "0.3.0"}
     },
     {
       "v": "arrToStr",

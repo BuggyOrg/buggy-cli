@@ -1,0 +1,143 @@
+{
+  "code": "(io/stdout (translator/number_to_string (logic/mux 4 2 (math/less (translator/string_to_number (io/stdin)) 10))))",
+  "nodes": [
+    {
+      "v": "stdout_0",
+      "value": {
+        "meta": "io/stdout",
+        "name": "stdout_0"
+      }
+    },
+    {
+      "v": "number_to_string_1",
+      "value": {
+        "meta": "translator/number_to_string",
+        "name": "number_to_string_1"
+      }
+    },
+    {
+      "v": "mux_2",
+      "value": {
+        "meta": "logic/mux",
+        "name": "mux_2"
+      }
+    },
+    {
+      "v": "const(4)_3",
+      "value": {
+        "meta": "math/const",
+        "name": "const(4)_3",
+        "params": {
+          "value": 4
+        }
+      }
+    },
+    {
+      "v": "const(2)_4",
+      "value": {
+        "meta": "math/const",
+        "name": "const(2)_4",
+        "params": {
+          "value": 2
+        }
+      }
+    },
+    {
+      "v": "less_5",
+      "value": {
+        "meta": "math/less",
+        "name": "less_5"
+      }
+    },
+    {
+      "v": "string_to_number_6",
+      "value": {
+        "meta": "translator/string_to_number",
+        "name": "string_to_number_6"
+      }
+    },
+    {
+      "v": "stdin_7",
+      "value": {
+        "meta": "io/stdin",
+        "name": "stdin_7"
+      }
+    },
+    {
+      "v": "const(10)_8",
+      "value": {
+        "meta": "math/const",
+        "name": "const(10)_8",
+        "params": {
+          "value": 10
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "v": "const(4)_3",
+      "w": "mux_2",
+      "value": {
+        "outPort": "output",
+        "inPort": "input1"
+      }
+    },
+    {
+      "v": "const(2)_4",
+      "w": "mux_2",
+      "value": {
+        "outPort": "output",
+        "inPort": "input2"
+      }
+    },
+    {
+      "v": "stdin_7",
+      "w": "string_to_number_6",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "string_to_number_6",
+      "w": "less_5",
+      "value": {
+        "outPort": "output",
+        "inPort": "isLess"
+      }
+    },
+    {
+      "v": "const(10)_8",
+      "w": "less_5",
+      "value": {
+        "outPort": "output",
+        "inPort": "than"
+      }
+    },
+    {
+      "v": "less_5",
+      "w": "mux_2",
+      "value": {
+        "outPort": "value",
+        "inPort": "control"
+      }
+    },
+    {
+      "v": "mux_2",
+      "w": "number_to_string_1",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    },
+    {
+      "v": "number_to_string_1",
+      "w": "stdout_0",
+      "value": {
+        "outPort": "output",
+        "inPort": "input"
+      }
+    }
+  ]
+}
