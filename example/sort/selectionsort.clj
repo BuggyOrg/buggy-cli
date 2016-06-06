@@ -1,5 +1,4 @@
 
-
 (defco fold [list fn init]
   (logic/mux
     init
