@@ -1,6 +1,6 @@
 {
   "name": "@buggyorg/buggy",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "description": "Rich code generation system.",
   "main": "./lib/api.js",
   "bin": {
