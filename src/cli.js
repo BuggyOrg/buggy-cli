@@ -197,6 +197,7 @@ program
       return res
     })
     .then((res) => addContinuations(res))
+    .then((res) => delinkify(res))
     .then((res) => normalize(res))
     .then((res) => remodelPorts(res))
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
