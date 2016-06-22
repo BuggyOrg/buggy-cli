@@ -1,17 +1,15 @@
 (import all)
 
 (defco fold [list fn init]
-  (logic/mux
+  (if (array/empty list)
     init
-    (functional/apply (functional/partial 1 fn (array/first list)) (fold (array/rest list) fn init))
-    (array/empty list)))
+    (functional/apply (functional/partial 1 fn (array/first list)) (fold (array/rest list) fn init))))
 
 
 (defco bubble-n-up [list i]
-  (logic/mux
+  (if (logic/and (math/less (array/at i list) (array/at (+ i -1) list)) (logic/not (math/less i 1)))
     (bubble-n-up (array/swap list i (+ i -1)) (+ i -1))
-    list
-    (logic/and (math/less (array/at i list) (array/at (+ i -1) list)) (logic/not (math/less i 1)))))
+    list))
 
 (defco bubble-up [list] ; takes the last element and swaps it until it is in the correct position
   (bubble-n-up list (+ (array/length list) -1)))

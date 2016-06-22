@@ -68,7 +68,7 @@ describe('Buggy CLI', () => {
     return runCompiled('example/lambda/lambda.flat.clj', '77')
       .then((inc) => expect(inc).to.equal('78'))
   })
-
+/*
   it('Compiles and runs the map program', () => {
     return expect(runCompiled('example/reduce/map.json')).to.be.fulfilled
   })
@@ -77,7 +77,7 @@ describe('Buggy CLI', () => {
     return runCompiled('example/reduce/map.json', '1,2,3,2,5,1')
       .then((fac) => expect(JSON.parse('[' + fac + ']')).to.deep.equal([2, 3, 4, 3, 6, 2]))
   })
-
+*/
   it('Compiles and runs a program with a multiplexer', () => {
     return expect(runCompiled('example/mux.json')).to.be.fulfilled
   })
