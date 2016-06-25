@@ -32,8 +32,10 @@ var list = _.shuffle(_.range(15000))
 var start
 
 var goFile = tempfile('.go')
-runCLI('compile sort/quicksort.clj golang > ' + goFile)
+console.log('building')
+runCLI('compile sort/quicksort_mux.clj golang > ' + goFile)
 .then(() => {
+  console.log('built: ', goFile)
   start = new Date().getTime()
   return runProgram('go run', goFile, list.join(','))
 })

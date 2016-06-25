@@ -149,9 +149,11 @@ program
 program
   .command('compile <input> <language>')
   .option('-o, --output <outputFile>', 'The output filename to generate')
+  .option('-s, --sequential', 'Generate sequential code')
   .description('Compile a program description into a program using a specific language.')
   .action((json, language, options) => {
     var client = lib(program.elastic)
+    const genCode = (options.sequential) ? gogen.generateSequentialCode : gogen.generateCode
     getInputJson(json)
     .then((res) => resolve(res, client.get))
     .then((res) => check(res))
@@ -169,7 +171,7 @@ program
     .then((res) => normalize(res))
     .then((res) => remodelPorts(res))
     .then((res) => gogen.preprocess(res))
-    .then((res) => gogen.generateCode(res))
+    .then((res) => genCode(res))
 //    .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
     .then((res) => console.log(res))
     .catch((err) => {
