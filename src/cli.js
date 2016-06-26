@@ -6,6 +6,7 @@ import fs from 'fs'
 import lib from '@buggyorg/component-library'
 import {resolve} from '@buggyorg/resolve'
 import {remodelPorts} from '@buggyorg/npg-port-remodeler'
+import decompoundify from '@buggyorg/decompoundify'
 import {normalize} from '@buggyorg/dupjoin'
 import {applyTypings} from '@buggyorg/typify'
 import {convertGraph} from '@buggyorg/graphlib2kgraph'
@@ -105,6 +106,7 @@ program
   .command('interactive <json>')
   .option('-b, --bare', 'Do not resolve the graph file')
   .option('-t, --types', 'Resolve types in graph')
+  .option('-d, --decompoundify', 'Remove all unnecessary compounds')
   .option('-s, --steps <n>', 'Maximum number of steps for resolving generics (only works with t). [debug mode]')
   .option('-c, --cancle', 'Cancle before starting browser session. [debug mode]')
   .option('-m, --mux', 'Calculate mux continuations. Only when `--types` is enabled')
@@ -126,11 +128,16 @@ program
         }
         return res
       })
+      if (options.decompoundify) {
+        resPromise = resPromise.then((res) => decompoundify(res))
+      }
       if (options.mux) {
         // resPromise = resPromise.then((res) => { console.error(JSON.stringify(graphlib.json.write(res))); return res })
         resPromise = resPromise.then((res) => addContinuations(res))
           .then((res) => delinkify(res))
       }
+    } else if (options.decompoundify) {
+      resPromise = resPromise.then((res) => decompoundify(res))
     }
     if (options.cancle) {
       resPromise = resPromise.then(() => process.exit(1))
@@ -166,6 +173,7 @@ program
       }
       return res
     })
+    .then((res) => decompoundify(res))
     .then((res) => addContinuations(res))
     .then((res) => delinkify(res))
     .then((res) => normalize(res))
