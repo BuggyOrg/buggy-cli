@@ -178,7 +178,7 @@ program
     .then((res) => delinkify(res))
     .then((res) => normalize(res))
     .then((res) => remodelPorts(res))
-    .then((res) => gogen.preprocess(res))
+    .then((res) => gogen.preprocess(res, (options.sequential) ? '*' : null))
     .then((res) => genCode(res))
 //    .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
     .then((res) => console.log(res))
