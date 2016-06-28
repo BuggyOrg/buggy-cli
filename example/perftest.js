@@ -33,7 +33,7 @@ var start
 
 var goFile = tempfile('.go')
 console.log('building')
-runCLI('compile sort/quicksort_mux.clj golang > ' + goFile)
+runCLI('compile sort/quicksort.clj golang -s > ' + goFile)
 .then(() => {
   console.log('built: ', goFile)
   start = new Date().getTime()
