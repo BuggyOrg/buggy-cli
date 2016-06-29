@@ -174,7 +174,7 @@ program
       return res
     })
     .then((res) => decompoundify(res))
-    .then((res) => addContinuations(res))
+    .then((res) => addContinuations(res, {includeControl: options.sequential}))
     .then((res) => delinkify(res))
     .then((res) => normalize(res))
     .then((res) => remodelPorts(res))
@@ -206,6 +206,7 @@ program
       }
       return res
     })
+    .then((res) => decompoundify(res))
     .then((res) => addContinuations(res))
     .then((res) => delinkify(res))
     .then((res) => normalize(res))

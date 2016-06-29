@@ -143,7 +143,7 @@ describe('Buggy CLI - Sequential implementations', () => {
       .then((res) => expect(res).to.equal('720'))
   })
 
-  it.only('Creates a correct ackermann programm', () => {
+  it('Creates a correct ackermann programm', () => {
     return runCompiled('example/ack.clj', '3')
       .then((res) => expect(res).to.equal('61'))
   })
