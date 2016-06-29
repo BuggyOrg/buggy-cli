@@ -30,7 +30,6 @@
     "@buggyorg/checker": "^0.1.2",
     "@buggyorg/component-library": "^0.3.7",
     "@buggyorg/decompoundify": "^0.1.1",
-    "@buggyorg/delinkify": "^0.1.1",
     "@buggyorg/dupjoin": "^0.1.14",
     "@buggyorg/dynatype-network-graph": "^0.1.12",
     "@buggyorg/functional": "^0.1.7",

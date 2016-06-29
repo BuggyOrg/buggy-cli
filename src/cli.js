@@ -17,7 +17,6 @@ import {graphToWebsite} from '@buggyorg/graphify'
 import {check} from '@buggyorg/checker'
 import graphlib from 'graphlib'
 import gogen from '@buggyorg/gogen'
-import delinkify from '@buggyorg/delinkify'
 import {replaceGenerics, isGenericFree, genericNodes} from '@buggyorg/generics'
 import {resolveLambdaTypes} from '@buggyorg/functional'
 import promisedExec from 'promised-exec'
@@ -134,7 +133,6 @@ program
       if (options.mux) {
         // resPromise = resPromise.then((res) => { console.error(JSON.stringify(graphlib.json.write(res))); return res })
         resPromise = resPromise.then((res) => addContinuations(res))
-          .then((res) => delinkify(res))
       }
     } else if (options.decompoundify) {
       resPromise = resPromise.then((res) => decompoundify(res))
@@ -175,7 +173,6 @@ program
     })
     .then((res) => decompoundify(res))
     .then((res) => addContinuations(res, {includeControl: options.sequential}))
-    .then((res) => delinkify(res))
     .then((res) => normalize(res))
     .then((res) => remodelPorts(res))
     .then((res) => gogen.preprocess(res, options.sequential))
@@ -208,7 +205,6 @@ program
     })
     .then((res) => decompoundify(res))
     .then((res) => addContinuations(res))
-    .then((res) => delinkify(res))
     .then((res) => normalize(res))
     .then((res) => remodelPorts(res))
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
