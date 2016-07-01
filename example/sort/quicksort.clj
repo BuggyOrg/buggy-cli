@@ -1,15 +1,17 @@
 (import all)
 
-(defco fold [list fn init]
-  (if (array/empty list)
+(defco foldl [list fn init]
+  (logic/if (array/empty list)
     init
-    (functional/apply (functional/partial 1 fn (array/first list)) (fold (array/rest list) fn init))))
+    (foldl (array/rest list) fn (functional/apply (functional/partial 1 fn (array/first list)) init))
+  ))
 
 (defco filter [list fn]
-  (fold list (functional/partial 0 (lambda (fn acc cur)
-    (if (functional/apply fn cur)
-      (array/prepend acc cur)
-      acc)) fn) []))
+  (foldl list (functional/partial 0 (lambda (fn acc cur)
+    (logic/mux
+      (array/append acc cur)
+      acc
+      (functional/apply fn cur))) fn) []))
 
 (defco partition-left [list p]
   (filter list (functional/partial 0 (lambda (n m) (math/less m n)) p)))
