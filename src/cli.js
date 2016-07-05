@@ -154,13 +154,18 @@ program
 program
   .command('compile <input> <language>')
   .option('-o, --output <outputFile>', 'The output filename to generate')
+  .option('-b, --bare', 'Do not resolve the json file.')
   .option('-s, --sequential', 'Generate sequential code')
+  .option('-c, --countOperations', 'Count the number of performed operations during execution.')
   .description('Compile a program description into a program using a specific language.')
   .action((json, language, options) => {
     var client = lib(program.elastic)
     const genCode = (options.sequential) ? gogen.generateSequentialCode : gogen.generateCode
-    getInputJson(json)
-    .then((res) => resolve(res, client.get))
+    var resPromise = getInputJson(json)
+    if (!options.bare) {
+      resPromise = resPromise.then((res) => resolve(res, client.get))
+    }
+    resPromise
     .then((res) => check(res))
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
@@ -176,7 +181,7 @@ program
     .then((res) => normalize(res))
     .then((res) => remodelPorts(res))
     .then((res) => gogen.preprocess(res, options.sequential))
-    .then((res) => genCode(res))
+    .then((res) => genCode(res, {countOperations: options.countOperations}))
 //    .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
     .then((res) => console.log(res))
     .catch((err) => {
@@ -187,12 +192,17 @@ program
 
 program
   .command('ng <json>')
+  .option('-b, --bare', 'Do not resolve the json file.')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
     var client = lib(program.elastic)
     getInputJson(json)
-    .then((res) => resolve(res, client.get))
+    var resPromise = getInputJson(json)
+    if (!options.bare) {
+      resPromise = resPromise.then((res) => resolve(res, client.get))
+    }
+    resPromise
     .then((res) => check(res))
     .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
@@ -204,7 +214,7 @@ program
       return res
     })
     .then((res) => decompoundify(res))
-    .then((res) => addContinuations(res))
+    .then((res) => addContinuations(res, {includeControl: options.sequential}))
     .then((res) => normalize(res))
     .then((res) => remodelPorts(res))
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res), null, 2)))
@@ -216,6 +226,7 @@ program
 
 program
   .command('ng-wg <json>')
+  .option('-b, --bare', 'Do not resolve the json file.')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
