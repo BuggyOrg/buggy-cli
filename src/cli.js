@@ -23,6 +23,7 @@ import promisedExec from 'promised-exec'
 import tempfile from 'tempfile'
 import path from 'path'
 import open from 'open'
+import getStdin from 'get-stdin'
 
 var server = ''
 var defaultElastic = ' Defaults to BUGGY_COMPONENT_LIBRARY_HOST'
@@ -36,13 +37,26 @@ if (process.env.BUGGY_COMPONENT_LIBRARY_HOST) {
 }
 
 const getInputJson = (file) => {
-  var resPromise = Promise.resolve(fs.readFileSync(file, 'utf8'))
-  if (path.extname(file) === '.clj') {
-    resPromise = resPromise
-      .then((res) => parse_to_json(res, true))
-      .then((res) => graphlib.json.read(res))
+  var resPromise
+  if (file) {
+    resPromise = Promise.resolve(fs.readFileSync(file, 'utf8'))
+    if (path.extname(file) === '.clj') {
+      resPromise = resPromise
+        .then((res) => parse_to_json(res, true))
+        .then((res) => graphlib.json.read(res))
+    } else {
+      resPromise = resPromise.then((res) => graphlib.json.read(JSON.parse(res)))
+    }
   } else {
-    resPromise = resPromise.then((res) => graphlib.json.read(JSON.parse(res)))
+    resPromise = getStdin()
+      .then((res) => {
+        try {
+          return graphlib.json.read(JSON.parse(res))
+        } catch (e) {
+          // doesn't seem to be a valid graph, assume lisgy
+          return parse_to_json(res, true)
+        }
+      })
   }
   return resPromise
 }
@@ -53,7 +67,7 @@ program
   .parse(process.argv)
 
 program
-  .command('json <json>')
+  .command('json [json]')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
@@ -63,7 +77,7 @@ program
   })
 
 program
-  .command('resolve <json>')
+  .command('resolve [json]')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
@@ -75,7 +89,7 @@ program
   })
 
 program
-  .command('svg <json>')
+  .command('svg [json]')
   .option('-b, --bare', 'Do not resolve the graph file')
   .description('Create a SVG flow chart diagram for the given json file.')
   .action((json, options) => {
@@ -102,7 +116,7 @@ program
   })
 
 program
-  .command('interactive <json>')
+  .command('interactive [json]')
   .option('-b, --bare', 'Do not resolve the graph file')
   .option('-t, --types', 'Resolve types in graph')
   .option('-d, --decompoundify', 'Remove all unnecessary compounds')
@@ -152,7 +166,7 @@ program
   })
 
 program
-  .command('compile <input> <language>')
+  .command('compile [input] <language>')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .option('-b, --bare', 'Do not resolve the json file.')
   .option('-s, --sequential', 'Generate sequential code')
@@ -191,7 +205,7 @@ program
   })
 
 program
-  .command('ng <json>')
+  .command('ng [json]')
   .option('-b, --bare', 'Do not resolve the json file.')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
@@ -225,7 +239,7 @@ program
   })
 
 program
-  .command('ng-wg <json>')
+  .command('ng-wg [json]')
   .option('-b, --bare', 'Do not resolve the json file.')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
@@ -248,7 +262,7 @@ program
   })
 
 program
-  .command('dup <json>')
+  .command('dup [json]')
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
   .action((json, language, options) => {
