@@ -54,7 +54,7 @@ const getInputJson = (file) => {
           return graphlib.json.read(JSON.parse(res))
         } catch (e) {
           // doesn't seem to be a valid graph, assume lisgy
-          return parse_to_json(res, true)
+          return graphlib.json.read(parse_to_json(res, true))
         }
       })
   }
