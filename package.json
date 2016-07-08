@@ -37,7 +37,7 @@
     "@buggyorg/gogen": "^0.2.11",
     "@buggyorg/graphify": "^0.1.18",
     "@buggyorg/graphlib2kgraph": "^0.1.11",
-    "@buggyorg/lisgy": "^0.1.5",
+    "@buggyorg/lisgy": "^0.1.7",
     "@buggyorg/muxcontinuations": "^0.1.6",
     "@buggyorg/npg-port-remodeler": "^0.1.14",
     "@buggyorg/resolve": "^0.1.23",

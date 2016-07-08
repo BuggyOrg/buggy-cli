@@ -51,12 +51,13 @@ const getInputJson = (file) => {
     resPromise = getStdin()
       .then((res) => {
         try {
-          return graphlib.json.read(JSON.parse(res))
+          return JSON.parse(res)
         } catch (e) {
           // doesn't seem to be a valid graph, assume lisgy
-          return graphlib.json.read(parse_to_json(res, true))
+          return parse_to_json(res, true)
         }
       })
+      .then((res) => graphlib.json.read(res))
   }
   return resPromise
 }
