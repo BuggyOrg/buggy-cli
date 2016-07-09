@@ -36,16 +36,15 @@ if (process.env.BUGGY_COMPONENT_LIBRARY_HOST) {
   defaultElastic += ' or if not set to http://localhost:9200'
 }
 
-const getInputJson = (file) => {
+const getInputJSON = (file) => {
   var resPromise
   if (file) {
     resPromise = Promise.resolve(fs.readFileSync(file, 'utf8'))
     if (path.extname(file) === '.clj') {
       resPromise = resPromise
         .then((res) => parse_to_json(res, true))
-        .then((res) => graphlib.json.read(res))
     } else {
-      resPromise = resPromise.then((res) => graphlib.json.read(JSON.parse(res)))
+      resPromise = resPromise.then((res) => JSON.parse(res))
     }
   } else {
     resPromise = getStdin()
@@ -57,9 +56,13 @@ const getInputJson = (file) => {
           return parse_to_json(res, true)
         }
       })
-      .then((res) => graphlib.json.read(res))
   }
   return resPromise
+}
+
+const getInputGraph = (file) => {
+  return getInputJSON(file)
+  .then((res) => graphlib.json.read(res))
 }
 
 program
@@ -72,8 +75,8 @@ program
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
-    getInputJson(json)
-    .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
+    getInputJSON(json)
+    .then((res) => console.log(JSON.stringify(res)))
     .catch((err) => console.error(err.stack))
   })
 
@@ -83,7 +86,7 @@ program
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
     var client = lib(program.elastic)
-    getInputJson(json)
+    getInputGraph(json)
     .then((res) => resolve(res, client.get))
     .then((res) => console.log(JSON.stringify(graphlib.json.write(res))))
     .catch((err) => console.error(err.stack))
@@ -95,7 +98,7 @@ program
   .description('Create a SVG flow chart diagram for the given json file.')
   .action((json, options) => {
     var client = lib(program.elastic)
-    var resPromise = getInputJson(json)
+    var resPromise = getInputGraph(json)
     if (options.bare) {
       resPromise = Promise.resolve(graphlib.json.read(JSON.parse(fs.readFileSync(json, 'utf8'))))
     } else {
@@ -123,11 +126,12 @@ program
   .option('-d, --decompoundify', 'Remove all unnecessary compounds')
   .option('-s, --steps <n>', 'Maximum number of steps for resolving generics (only works with t). [debug mode]')
   .option('-c, --cancle', 'Cancle before starting browser session. [debug mode]')
+  .option('-n, --norm', 'Transform the graph into the normalized form.')
   .option('-m, --mux', 'Calculate mux continuations. Only when `--types` is enabled')
   .description('Opens a browser window with an interactive version of the layouted graph')
   .action((json, options) => {
     var client = lib(program.elastic)
-    var resPromise = getInputJson(json)
+    var resPromise = getInputGraph(json)
     if (!options.bare) {
       resPromise = resPromise.then((res) => resolve(res, client.get))
     }
@@ -151,6 +155,9 @@ program
       }
     } else if (options.decompoundify) {
       resPromise = resPromise.then((res) => decompoundify(res))
+    }
+    if (options.norm) {
+      resPromise = resPromise.then((res) => normalize(res))
     }
     if (options.cancle) {
       resPromise = resPromise.then(() => process.exit(1))
@@ -176,7 +183,7 @@ program
   .action((json, language, options) => {
     var client = lib(program.elastic)
     const genCode = (options.sequential) ? gogen.generateSequentialCode : gogen.generateCode
-    var resPromise = getInputJson(json)
+    var resPromise = getInputGraph(json)
     if (!options.bare) {
       resPromise = resPromise.then((res) => resolve(res, client.get))
     }
@@ -212,8 +219,7 @@ program
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
     var client = lib(program.elastic)
-    getInputJson(json)
-    var resPromise = getInputJson(json)
+    var resPromise = getInputGraph(json)
     if (!options.bare) {
       resPromise = resPromise.then((res) => resolve(res, client.get))
     }
@@ -246,7 +252,7 @@ program
   .description('Compile a program description into a program using a specific language.')
   .action((json, options) => {
     var client = lib(program.elastic)
-    getInputJson(json)
+    getInputGraph(json)
     .then((res) => resolve(res, client.get))
     .then((res) => check(res))
     .then((res) => addContinuations(res))
@@ -268,7 +274,7 @@ program
   .description('Compile a program description into a program using a specific language.')
   .action((json, language, options) => {
     var client = lib(program.elastic)
-    getInputJson(json)
+    getInputGraph(json)
     .then((res) => resolve(res, client.get))
     .then((res) => check(res))
     .then((res) => addContinuations(res))
