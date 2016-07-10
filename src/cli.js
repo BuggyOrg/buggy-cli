@@ -12,6 +12,7 @@ import {applyTypings} from '@buggyorg/typify'
 import {convertGraph} from '@buggyorg/graphlib2kgraph'
 import addContinuations from '@buggyorg/muxcontinuations'
 import {parse_to_json} from '@buggyorg/lisgy'
+import {optimize} from '@buggyorg/nitro'
 // import kgraph2Svg from '@buggyorg/graphify'
 import {graphToWebsite} from '@buggyorg/graphify'
 import {check} from '@buggyorg/checker'
@@ -127,6 +128,7 @@ program
   .option('-s, --steps <n>', 'Maximum number of steps for resolving generics (only works with t). [debug mode]')
   .option('-c, --cancle', 'Cancle before starting browser session. [debug mode]')
   .option('-n, --norm', 'Transform the graph into the normalized form.')
+  .option('-o, --optimize', 'Optimize the program graph.')
   .option('-m, --mux', 'Calculate mux continuations. Only when `--types` is enabled')
   .description('Opens a browser window with an interactive version of the layouted graph')
   .action((json, options) => {
@@ -153,11 +155,14 @@ program
         // resPromise = resPromise.then((res) => { console.error(JSON.stringify(graphlib.json.write(res))); return res })
         resPromise = resPromise.then((res) => addContinuations(res))
       }
+      if (options.optimize) {
+        resPromise = resPromise.then((res) => { optimize(res); return res })
+      }
     } else if (options.decompoundify) {
       resPromise = resPromise.then((res) => decompoundify(res))
     }
     if (options.norm) {
-      resPromise = resPromise.then((res) => normalize(res))
+      resPromise = resPromise.then((res) => normalize(res, {createDuplicatesAndJoins: true}))
     }
     if (options.cancle) {
       resPromise = resPromise.then(() => process.exit(1))
@@ -178,6 +183,7 @@ program
   .option('-o, --output <outputFile>', 'The output filename to generate')
   .option('-b, --bare', 'Do not resolve the json file.')
   .option('-s, --sequential', 'Generate sequential code')
+  .option('-o, --optimize', 'Optimize program before generating code')
   .option('-c, --countOperations', 'Count the number of performed operations during execution.')
   .description('Compile a program description into a program using a specific language.')
   .action((json, language, options) => {
@@ -187,9 +193,8 @@ program
     if (!options.bare) {
       resPromise = resPromise.then((res) => resolve(res, client.get))
     }
-    resPromise
+    resPromise = resPromise
     .then((res) => check(res))
-    .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => resolveLambdaTypes(res))
     .then((res) => replaceGenerics(res))
     .then((res) => {
@@ -198,9 +203,15 @@ program
       }
       return res
     })
+    if (options.optimize) {
+      resPromise = resPromise.then((res) => { optimize(res); return res })
+    }
+    resPromise
+    .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
     .then((res) => decompoundify(res))
     .then((res) => addContinuations(res, {includeControl: options.sequential}))
     .then((res) => normalize(res))
+    // .then((res) => normalize(res, {createDuplicatesAndJoins: !options.sequential})) needs support in gogen
     .then((res) => remodelPorts(res))
     .then((res) => gogen.preprocess(res, options.sequential))
     .then((res) => genCode(res, {countOperations: options.countOperations}))
