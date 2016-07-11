@@ -39,6 +39,7 @@
     "@buggyorg/graphlib2kgraph": "^0.1.11",
     "@buggyorg/lisgy": "^0.1.7",
     "@buggyorg/muxcontinuations": "^0.1.6",
+    "@buggyorg/nitro": "^0.1.0",
     "@buggyorg/npg-port-remodeler": "^0.1.14",
     "@buggyorg/resolve": "^0.1.23",
     "@buggyorg/typify": "^0.1.2",
