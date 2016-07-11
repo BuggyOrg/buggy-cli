@@ -23,6 +23,7 @@ import promisedExec from 'promised-exec'
 import tempfile from 'tempfile'
 import path from 'path'
 import open from 'open'
+import {convert} from '@buggyorg/patternmatching'
 
 var server = ''
 var defaultElastic = ' Defaults to BUGGY_COMPONENT_LIBRARY_HOST'
@@ -113,6 +114,7 @@ program
   .action((json, options) => {
     var client = lib(program.elastic)
     var resPromise = getInputJson(json)
+    // resPromise = resPromise.then((res) => convert(res)) // TODO
     if (!options.bare) {
       resPromise = resPromise.then((res) => resolve(res, client.get))
     }
