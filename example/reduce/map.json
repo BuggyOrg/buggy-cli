@@ -7,7 +7,7 @@
   "nodes": [
     {
       "v": "in",
-      "value": {"meta": "io/stdin", "version": "0.2.0"}
+      "value": {"meta": "io/stdin"}
     },
     {
       "v": "lambda_inc",
@@ -26,25 +26,28 @@
               {"from": "i", "to": "incNode:i"},
               {"from": "incNode:inc", "to": "inc"}
             ]
+          },
+          "settings": {
+            "argumentOrdering": ["i", "inc"]
           }
         }
       }
     },
     {
       "v": "strToArr",
-      "value": {"meta": "translator/string_to_array", "version": "0.1.0", "typeHint": {"output": "[number]"}}
+      "value": {"meta": "translator/string_to_array", "typeHint": {"output": "[number]"}}
     },
     {
       "v": "mapInc",
-      "value": {"meta": "functional/map", "version": "0.3.0"}
+      "value": {"meta": "functional/map"}
     },
     {
       "v": "arrToStr",
-      "value": {"meta": "translator/array_to_string", "version": "0.1.0"}
+      "value": {"meta": "translator/array_to_string"}
     },
     {
       "v": "out",
-      "value": {"meta": "io/stdout", "version": "0.2.0"}
+      "value": {"meta": "io/stdout"}
     }
   ],
   "edges": [

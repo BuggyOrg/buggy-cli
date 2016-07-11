@@ -1,33 +1,28 @@
-
+(import all)
 
 (defco fold [list fn init]
-  (logic/mux
+  (if (array/empty list)
     init
-    (functional/apply (functional/partial 1 fn (array/first list)) (fold (array/rest list) fn init))
-    (array/empty list)))
+    (functional/apply (functional/partial 1 fn (array/first list)) (fold (array/rest list) fn init))))
 
 (defco filter [list fn]
   (fold list (functional/partial 0 (lambda (fn acc cur)
-    (logic/mux
+    (if (functional/apply fn cur)
       (array/prepend acc cur)
-      acc
-      (functional/apply fn cur))) fn) []))
+      acc)) fn) []))
 
 (defco min [list]
-  (logic/mux
+  (if (array/empty list)
     100000000000
-    (logic/mux
+    (if (math/less (array/first list) (min (array/rest list)))
       (array/first list)
-      (min (array/rest list))
-      (math/less (array/first list) (min (array/rest list))))
-    (array/empty list)))
+      (min (array/rest list)))))
 
 (defco selectionsort [list]
-  (logic/mux
+  (if (array/empty list)
     list
     (let [m (min list)]
       (array/prepend (selectionsort (filter list 
-        (functional/partial 0 (lambda (x y) (logic/not (logic/equal x y))) m))) m))
-    (array/empty list)))
+        (functional/partial 0 (lambda (x y) (logic/not (logic/equal x y))) m))) m))))
 
 (io/stdout (translator/array_to_string (selectionsort (translator/string_to_array (io/stdin)))))

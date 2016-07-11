@@ -7,23 +7,23 @@
   "nodes": [
     {
       "v": "in",
-      "value": {"meta": "io/stdin", "version": "0.2.0"}
+      "value": {"meta": "io/stdin", "version": "0.3.0"}
     },
     {
       "v": "strToNum",
-      "value": {"meta": "translator/string_to_int", "version": "0.2.0"}
+      "value": {"meta": "translator/string_to_number", "version": "0.2.0"}
     },
     {
       "v": "inc",
-      "value": {"meta": "math/inc", "version": "0.3.0", "name": "inc"}
+      "value": {"meta": "math/inc", "version": "0.5.1", "name": "inc"}
     },
     {
       "v": "numToStr",
-      "value": {"meta": "translator/int_to_string", "version": "0.2.0"}
+      "value": {"meta": "translator/number_to_string", "version": "0.2.0"}
     },
     {
       "v": "out",
-      "value": {"meta": "io/stdout", "version": "0.2.0", "name": "out"}
+      "value": {"meta": "io/stdout", "version": "0.3.0", "name": "out"}
     }
   ],
   "edges": [

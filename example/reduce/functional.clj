@@ -1,15 +1,15 @@
 
 
-(defco fold [list fn init]
-  (logic/mux
+(defco foldl [list fn init]
+  (logic/if (array/empty list)
     init
-    (functional/apply (functional/partial 1 fn (array/first list)) (fold (array/rest list) fn init))
-    (array/empty list)))
+    (foldl (array/rest list) fn (functional/apply (functional/partial 1 fn (array/first list)) init))
+  ))
 
 (defco filter [list fn]
-  (fold list (functional/partial 0 (lambda (fn acc cur)
+  (foldl list (functional/partial 0 (lambda (fn acc cur)
     (logic/mux
-      (array/prepend acc cur)
+      (array/append acc cur)
       acc
       (functional/apply fn cur))) fn) []))
 

@@ -1,15 +1,15 @@
 (import all)
 
-(defco foldl [list fn init]
-  (logic/if (array/empty list)
+(defco fold [list fn init]
+  (logic/mux
     init
-    (foldl (array/rest list) fn (functional/apply (functional/partial 1 fn (array/first list)) init))
-  ))
+    (functional/apply (functional/partial 1 fn (array/first list)) (fold (array/rest list) fn init))
+     (array/empty list)))
 
 (defco filter [list fn]
-  (foldl list (functional/partial 0 (lambda (fn acc cur)
+  (fold list (functional/partial 0 (lambda (fn acc cur)
     (logic/mux
-      (array/append acc cur)
+      (array/prepend acc cur)
       acc
       (functional/apply fn cur))) fn) []))
 
@@ -20,10 +20,11 @@
   (filter list (functional/partial 0 (lambda (n m) (math/less n m)) p)))
 
 (defco quicksort [list]
-  (if (array/empty list)
+  (logic/mux
     list
     (array/concat
       (array/append (quicksort (partition-left (array/rest list) (array/first list))) (array/first list))
-      (quicksort (partition-right (array/rest list) (array/first list))))))
+      (quicksort (partition-right (array/rest list) (array/first list))))
+    (array/empty list)))
 
 (io/stdout (translator/array_to_string (quicksort (translator/string_to_array (io/stdin)))))
