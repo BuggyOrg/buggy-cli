@@ -134,9 +134,7 @@ program
   .description('Opens a browser window with an interactive version of the layouted graph')
   .action((json, options) => {
     var client = lib(program.elastic)
-    var resPromise = getInputJSON(json)
-    // resPromise = resPromise.then((res) => convert(res)) // TODO
-    resPromise = resPromise.then((res) => console.log(res))
+    var resPromise = getInputGraph(json)
     if (!options.bare) {
       resPromise = resPromise.then((res) => resolve(res, client.get))
     }
