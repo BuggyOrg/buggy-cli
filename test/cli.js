@@ -116,6 +116,11 @@ describe('Buggy CLI - Channel implementations', () => {
     return runCompiled('example/lambda/lambda.call.clj', '2')
       .then((res) => expect(res).to.deep.equal('3'))
   })
+
+  it('Can add two vectors', () => {
+    return runCompiled('example/linalg/addvec.clj', '2,5,3,6')
+      .then((res) => expect(res).to.deep.equal('4, 10, 6, 12'))
+  })
 })
 
 describe('Buggy CLI - Sequential implementations', () => {
@@ -179,9 +184,14 @@ describe('Buggy CLI - Sequential implementations', () => {
     return runCompiled('example/lambda/lambda.call.clj', '2')
       .then((res) => expect(res).to.deep.equal('3'))
   })
+
+  it('Can add two vectors', () => {
+    return runCompiled('example/linalg/addvec.clj', '2,5,3,6')
+      .then((res) => expect(res).to.deep.equal('4, 10, 6, 12'))
+  })
 })
 
-describe.only('Buggy CLI - Optimized Sequential implementations', () => {
+describe('Buggy CLI - Optimized Sequential implementations', () => {
   const runCompiled = runCompiledOptSeq
 
   it('Creates a correct increment program', () => {
@@ -241,5 +251,10 @@ describe.only('Buggy CLI - Optimized Sequential implementations', () => {
   it('Creates a correct lambda-call program', () => {
     return runCompiled('example/lambda/lambda.call.clj', '2')
       .then((res) => expect(res).to.deep.equal('3'))
+  })
+
+  it('Can add two vectors', () => {
+    return runCompiled('example/linalg/addvec.clj', '2,5,3,6')
+      .then((res) => expect(res).to.deep.equal('4, 10, 6, 12'))
   })
 })

@@ -135,13 +135,9 @@ program
   .action((json, options) => {
     var client = lib(program.elastic)
     var resPromise = getInputJSON(json)
-    // resPromise = resPromise.then((res) => convert(res)) // TODO
-    resPromise = resPromise.then((res) => convert(res))
 
-    resPromise = resPromise.then((res) => {
-      // fs.writeFileSync('test2.json', JSON.stringify(res, null, 2))
-      return graphlib.json.read(JSON.parse(JSON.stringify(res, null, 2)))
-    })
+    resPromise = resPromise.then((res) => convert(res))
+    resPromise = resPromise.then((res) => graphlib.json.read(JSON.parse(JSON.stringify(res, null, 2))))
 
     if (!options.bare) {
       resPromise = resPromise.then((res) => resolve(res, client.get))
