@@ -24,7 +24,7 @@ import promisedExec from 'promised-exec'
 import tempfile from 'tempfile'
 import path from 'path'
 import open from 'open'
-// import {convert} from '@buggyorg/patternmatching'
+import {convert} from '@buggyorg/patternmatching'
 import getStdin from 'get-stdin'
 
 var server = ''
@@ -134,12 +134,19 @@ program
   .description('Opens a browser window with an interactive version of the layouted graph')
   .action((json, options) => {
     var client = lib(program.elastic)
-    var resPromise = getInputJson(json)
+    var resPromise = getInputJSON(json)
     // resPromise = resPromise.then((res) => convert(res)) // TODO
-    resPromise = resPromise.then((res) => console.log(res))
+    resPromise = resPromise.then((res) => convert(res))
+
+    resPromise = resPromise.then((res) => {
+      // fs.writeFileSync('test2.json', JSON.stringify(res, null, 2))
+      return graphlib.json.read(JSON.parse(JSON.stringify(res, null, 2)))
+    })
+
     if (!options.bare) {
       resPromise = resPromise.then((res) => resolve(res, client.get))
     }
+
     if (options.types) {
       resPromise = resPromise
       .then((res) => applyTypings(res, {number: 'int64', bool: 'bool', string: 'string'}))
