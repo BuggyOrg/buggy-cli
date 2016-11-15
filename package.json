@@ -1,13 +1,13 @@
 {
   "name": "@buggyorg/buggy",
   "version": "0.1.27",
-  "description": "Rich code generation system.",
+  "description": "CLI for Buggy.",
   "main": "./lib/api.js",
   "bin": {
     "buggy": "./lib/cli.js"
   },
   "scripts": {
-    "test": "node node_modules/standard/bin/cmd.js src/**/*.js && babel src -d lib && mocha --compilers js:babel-register --timeout 20000",
+    "test": "standard src/**/*.js && babel src -d lib && mocha --compilers js:babel-register",
     "build": "babel src -d lib",
     "prepublish": "babel src -d lib"
   },
@@ -22,34 +22,26 @@
     "babel-register": "^6.3.13",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
+    "fs-extra": "^1.0.0",
     "mocha": "^2.4.5",
-    "standard": "^6.0.8",
-    "tempfile": "^1.1.1"
+    "standard": "^6.0.8"
   },
   "dependencies": {
-    "@buggyorg/checker": "^0.1.2",
-    "@buggyorg/component-library": "^0.3.7",
-    "@buggyorg/decompoundify": "^0.1.1",
-    "@buggyorg/dupjoin": "^0.1.17",
-    "@buggyorg/dynatype-network-graph": "^0.1.12",
-    "@buggyorg/functional": "^0.1.7",
-    "@buggyorg/generics": "^0.1.9",
-    "@buggyorg/gogen": "^0.2.12",
-    "@buggyorg/graphify": "^0.1.24",
-    "@buggyorg/graphlib2kgraph": "^0.1.11",
-    "@buggyorg/lisgy": "^0.1.8",
-    "@buggyorg/muxcontinuations": "^0.1.6",
-    "@buggyorg/nitro": "^0.1.0",
-    "@buggyorg/npg-port-remodeler": "^0.1.14",
-    "@buggyorg/resolve": "^0.1.23",
-    "@buggyorg/typify": "^0.1.3",
-    "babel-polyfill": "^6.7.4",
     "child-process-promise": "^2.2.0",
-    "commander": "^2.9.0",
     "get-stdin": "^5.0.1",
-    "graphlib": "^2.1.0",
-    "open": "0.0.5",
-    "promised-exec": "^1.0.1",
-    "tempfile": "^1.1.1"
-  }
+    "mkdirp-then": "^1.2.0",
+    "semver": "^5.3.0"
+  },
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BuggyOrg/buggy-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BuggyOrg/buggy-cli/issues"
+  },
+  "homepage": "https://github.com/BuggyOrg/buggy-cli#readme"
 }

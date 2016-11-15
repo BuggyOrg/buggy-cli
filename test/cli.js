@@ -1,5 +1,5 @@
 /* global describe, it, process */
-
+/*
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import {exec} from 'child_process'
@@ -258,3 +258,4 @@ describe('Buggy CLI - Optimized Sequential implementations', () => {
       .then((res) => expect(res).to.deep.equal('4, 10, 6, 12'))
   })
 })
+*/
