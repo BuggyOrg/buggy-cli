@@ -5,6 +5,7 @@
 import {join} from 'path'
 import os from 'os'
 import mkdirp from 'mkdirp-then'
+import {exec} from 'child-process-promise'
 
 const systemAppDir = () =>
   process.env.APPDATA ||
@@ -12,13 +13,13 @@ const systemAppDir = () =>
       ? join(os.homedir(), 'Library/Preferences')
       : join(os.homedir(), '/.local/share'))
 
-const buggyLocal = process.env.BUGGY_LOCAL_PATH || systemAppDir
+const buggyLocal = () => process.env.BUGGY_LOCAL_PATH || systemAppDir()
+const buggyDir = () => join(buggyLocal(), 'buggy', require('../package.json').version)
 
 const isNPMDependency = (dep) => {
   return new Promise.resolve(true)
 }
 
-const buggyDir = join(buggyLocal, 'buggy', require('../package.json').version)
 
 export const init = () => {
   return Promise.all([
@@ -29,6 +30,10 @@ export const init = () => {
 
 export const listTools = () => {
   
+}
+
+const installNPM = (dependency) => {
+  return exec('npm i', {options: {cwd: }})
 }
 
 export const install = (dependency) => {
