@@ -1,9 +1,10 @@
-/* global describe, it, process, beforeEach */
+/* global describe, it, process, beforeEach, afterEach */
 
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import {exec} from 'child-process-promise'
 import fs from 'fs-extra'
+import {join} from 'path'
 import {tmpdir} from 'os'
 import * as Tools from '../src/tools'
 import semver from 'semver'
@@ -32,15 +33,20 @@ const runCLI = (args, data) => {
 // before the first test!
 process.env.BUGGY_LOCAL_PATH = ''
 
-describe('Buggy CLI - Tools', () => {
-  beforeEach(() => {
-    if (process.env.BUGGY_LOCAL_PATH.length > 0) {
-      fs.removeSync(Tools.cachePath())
-    }
-    process.env.BUGGY_LOCAL_PATH = tmpdir()
-  })
+var testCounter = 1
 
-  describe('NPM dependencies', () => {
+describe('Buggy CLI - Tools', function () {
+  describe('Package initialization', function () {
+    this.timeout(10000)
+    beforeEach(() => {
+      process.env.BUGGY_LOCAL_PATH = join(tmpdir(), '' + testCounter++)
+      fs.removeSync(Tools.cachePath())
+    })
+
+    afterEach(() => {
+      fs.removeSync(Tools.cachePath())
+    })
+
     it('Successfully Initializes a new buggy cache', () => {
       return Tools.init()
       .then((init) => {
@@ -63,6 +69,35 @@ describe('Buggy CLI - Tools', () => {
         expect(tools).to.have.length(1)
         expect(tools[0].name).to.equal('@buggyorg/graphtools')
         expect(semver.satisfies('0.4.0-pre.7', tools[0].version)).to.be.true
+      })
+    })
+  })
+
+  describe('Working with packages', function () {
+    this.timeout(10000)
+    beforeEach(() => {
+      process.env.BUGGY_LOCAL_PATH = join(tmpdir(), '' + testCounter++)
+      fs.removeSync(Tools.cachePath())
+      fs.mkdirpSync(Tools.cachePath())
+      fs.copySync('./test/fixtures/baseCache/', Tools.cachePath())
+    })
+
+    afterEach(() => {
+      fs.removeSync(Tools.cachePath())
+    })
+
+    it('Successfully gets the entry point for a package', () => {
+      return Tools.entryPoint('test')
+      .then((entry) => {
+        expect(entry).to.match(/test\/index.js$/)
+      })
+    })
+
+    it('Gets the API for an package', () => {
+      return Tools.toolAPI('test')
+      .then((api) => {
+        expect(api).to.be.an('object')
+        expect(api.name).to.equal('test')
       })
     })
   })

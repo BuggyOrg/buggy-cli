@@ -32,10 +32,12 @@ export const init = () => {
 const dependenciesToArray = (deps) =>
   Object.keys(deps).map((d) => ({name: d, version: deps[d]}))
 
+const getPackageJson = (path) =>
+  JSON.parse(fs.readFileSync(join(path, 'package.json')))
+
 export const listTools = () => {
   return init()
-  .then(() => dependenciesToArray(
-    JSON.parse(fs.readFileSync(join(buggyDir(), 'package.json'))).dependencies))
+  .then(() => dependenciesToArray(getPackageJson(buggyDir()).dependencies || {}))
 }
 
 const installNPM = (dependency) => {
@@ -52,4 +54,23 @@ export const install = (dependency) => {
       throw new Error('Cannot install ' + dependency)
     }
   })
+}
+
+export const entryPoint = (dependency) => {
+  return listTools()
+  .then((tools) => {
+    if (tools.find((elem) => elem.name === dependency) !== -1) {
+      return
+    } else {
+      return install(dependency)
+    }
+  })
+  .then(() => getPackageJson(join(buggyDir(), 'node_modules', dependency)))
+  .then((pkg) => join(buggyDir(), 'node_modules', dependency, pkg.main))
+}
+
+export const toolAPI = (dependency) => {
+  return entryPoint(dependency)
+  .then((entry) => exec('node -e "console.log(JSON.stringify(require(\'' + entry + '\').buggyApi()))"'))
+  .then((res) => JSON.parse(res.stdout))
 }
