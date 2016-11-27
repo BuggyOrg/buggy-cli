@@ -101,4 +101,52 @@ describe('Buggy CLI - Tools', function () {
       })
     })
   })
+
+  describe('Package meta queries', () => {
+    // dummy provider creator
+    const provider = (dep, pkgs) => ({
+      dependencyVersion: () => Promise.resolve(dep),
+      packageVersions: () => Promise.resolve(pkgs)
+    })
+
+    describe('Package versions via `gatherVersions`', () => {
+      it('Gets the package versions out of the provider', () =>
+        expect(Tools.gatherVersions('', provider(null, ['0.1.0']))).to.eventually.eql(['0.1.0']))
+    })
+
+    describe('Graphtools dependency', () => {
+      it('Only accepts graphtool versions from 0.4.0 and above', () => {
+        expect(Tools.validGraphtoolsVersion('0.1.0')).to.be.false
+        expect(Tools.validGraphtoolsVersion('0.3.0')).to.be.false
+        expect(Tools.validGraphtoolsVersion('0.4.0')).to.be.true
+        expect(Tools.validGraphtoolsVersion('2.0.0')).to.be.true
+      })
+
+      it('Gets the dependencies out of the provider', () =>
+        expect(Tools.graphtoolDependency('', '', provider('0.5.0'))).to.eventually.equal('0.5.0'))
+
+      it('Returns null if the dependency is not defined', () =>
+        expect(Tools.graphtoolDependency('', '', provider())).to.eventually.be.not.ok)
+    })
+
+    describe('Valid Tool versions', () => {
+      it('Gathers all valid versions', () =>
+        Tools.validToolVersions({module: 'A'}, provider('0.5.0', ['0.2.0']))
+        .then((tool) => {
+          expect(tool).to.be.an('array')
+          expect(tool[0].graphtools).to.equal('0.5.0')
+          expect(tool[0].version).to.equal('0.2.0')
+        }))
+
+      it('Omits packages with deprecated graphtool dependencies', () =>
+        expect(Tools.validToolVersions({module: 'A'}, provider('0.1.0', ['0.2.0'])))
+        .to.eventually.eql([]))
+
+      it('Omits graphtools, if not dependent', () =>
+        Tools.validToolVersions({module: 'A'}, provider(null, ['0.1.0']))
+        .then((tool) => {
+          expect(tool[0].graphtools).to.not.be.ok
+        }))
+    })
+  })
 })
