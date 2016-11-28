@@ -9,7 +9,7 @@ var expect = chai.expect
 
 describe('Buggy API', () => {
   describe('Sequences', () => {
-    describe.only('Version management', () => {
+    describe('Version management', () => {
       it('Gathers all available valid versions', () => {
         var provider = {
           dependencyVersion: (p, v) => Promise.resolve(v),
