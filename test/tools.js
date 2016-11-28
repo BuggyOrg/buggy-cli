@@ -127,6 +127,17 @@ describe('Buggy CLI - Tools', function () {
 
       it('Returns null if the dependency is not defined', () =>
         expect(Tools.graphtoolDependency('', '', provider())).to.eventually.be.not.ok)
+
+      it('Can check whether a package satisfies the graphtools dependency', () => {
+        expect(Promise.all([
+          Tools.satisfies({graphtools: '0.4.0'}, '0.4.0-pre.7'),
+          Tools.satisfies({graphtools: '0.3.0'}, '0.4.0-pre.7'),
+          Tools.satisfies({graphtools: '1.2.0'}, '0.4.0-pre.7')
+        ])).to.eventually.eql([true, false, true])
+      })
+
+      it('Checks the registry for determining if a package satisfies the dependency', () =>
+        expect(Tools.satisfies({module: 'A'}, '0.2.0', provider('0.3.0'))).to.eventually.be.true)
     })
 
     describe('Valid Tool versions', () => {

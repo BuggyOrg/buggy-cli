@@ -100,9 +100,8 @@ export const gatherVersions = (pkg, provider) =>
 export const graphtoolDependency = (pkg, version, provider) =>
   provider.dependencyVersion(pkg, version, '@buggyorg/graphtools')
 
-const atLeastSemver = (version, least) => {
-  return !least || semver.gte(version, least)
-}
+const atLeastSemver = (version, least) =>
+  version == null || !least || semver.gte(version, least)
 
 /**
  * Checks whether a version is a valid graphtools version or not. The graphtools API changed from
@@ -110,9 +109,8 @@ const atLeastSemver = (version, least) => {
  * @params {String} version A Semver string of the version to test.
  * @returns {boolean} True if the version is at least 0.4.0-pre.7, false otherwise.
  */
-export const validGraphtoolsVersion = (version) => {
-  return version === null || atLeastSemver(version, '0.4.0-pre.7') // we currently want to match 0.4.0-pre.7 too
-}
+export const validGraphtoolsVersion = (version) => 
+  atLeastSemver(version, '0.4.0-pre.7') // we currently want to match 0.4.0-pre.7 too
 
 /**
  * A tool is valid if it has no graphtools dependency, or if the graphtools
@@ -125,8 +123,26 @@ export const validGraphtoolsVersion = (version) => {
  */
 export const validToolVersions = (tool, provider) =>
   gatherVersions(tool.module, provider)
+  .then((versions) => versions.filter((v) => atLeastSemver(v, tool.minVersion)))
   .then((versions) =>
     Promise.all(versions.map((version) => graphtoolDependency(tool.module, version, provider)
     .then((gtVersion) => ({tool, version, graphtools: gtVersion})))))
   .then((versions) => versions.filter((vs) => validGraphtoolsVersion(vs.graphtools)))
-  .then((versions) => versions.filter((v) => atLeastSemver(v.version, tool.minVersion)))
+
+/**
+ * Checks whether a tool satisfies the given graphtools version or not.
+ * @param {Tool} tool A tools object, identifying the module.
+ * @param {string} version A Semver version for the graphtools dependency.
+ * @param {Provider} provider A provider for the dependency information. his could be a npm-provider that
+ *   looks into the npm-registry.
+ * @returns {Promise<bool>} True if the tool can work with the given graphtools version, false otherwise.
+ */
+export const satisfies = (tool, version, provider) => {
+  if (tool.graphtools) {
+    return Promise.resolve(atLeastSemver(tool.graphtools, version))
+  } else {
+    return graphtoolDependency(tool.module, tool.version, provider)
+    .then((gtVersion) =>
+      Promise.resolve(atLeastSemver(gtVersion, version)))
+  }
+}

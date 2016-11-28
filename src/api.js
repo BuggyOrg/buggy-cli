@@ -42,16 +42,25 @@ export function allValidVersions (sequence, provider) {
     uniq(
       flatten(sequence).map((tool) => tool.graphtools)
       .filter((v) => v !== null)
-      .sort(compare))
+      .sort((a, b) => compare(b, a))) // sort descending
   )
 }
 
-export function pinpointSequenceVersions (sequence) {
-  return Promise.all(sequence.map(ToolAPI.validToolVersions))
-  .then((sequence) =>
-    uniq(
-      flatten(sequence).map((tool) => tool.graphtools)
-      .filter((v) => v !== null)
-      .sort(compare))
-  )
+function checkVersion (sequence, version, provider) {
+  return Promise.all(sequence.map((tool) => ToolAPI.satisfies(tool, version, provider)))
+  .then((sats) => sats.every((s) => s)) // Check if all tools satisfy the graphtools version.
+}
+
+function checkVersions (sequence, versions, provider) {
+  return checkVersion(sequence, versions[0], provider)
+  .then((valid) => {
+    if (valid) return versions[0]
+    else if (versions.length > 1) return checkVersions(sequence, versions.slice(1), provider)
+    else return null
+  })
+}
+
+export function pinpointSequenceVersions (sequence, provider) {
+  return allValidVersions(sequence, provider)
+  .then((versions) => checkVersions(sequence, versions, provider))
 }

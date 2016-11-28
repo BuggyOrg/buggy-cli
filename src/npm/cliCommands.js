@@ -17,9 +17,9 @@ const deRange = (versionRange) => {
  * the package does not depend on the dependency it will return null.
  */
 export const dependencyVersion = (pkg, pkgVersion, dependency) =>
-  exec('npm view ' + pkg + (pkgVersion) ? ('@' + pkgVersion) : '' + ' dependencies.' + dependency + ' --json')
+  exec('npm view ' + pkg + ((pkgVersion) ? ('@' + pkgVersion) : '') + ' dependencies.' + dependency + ' --json')
   .then((dependency) => {
-    if (/undefined/.test(dependency.stdout)) return null
+    if (/undefined/.test(dependency.stdout) || dependency.stdout.length < 2) return null
     return deRange(dependency.stdout.slice(1, -2))
   })
 

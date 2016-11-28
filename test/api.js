@@ -33,6 +33,15 @@ describe('Buggy API', () => {
           expect(vvs).to.have.length(1)
         })
       })
+
+      it('Accepts finds a version for a sequence', () => {
+        var provider = {
+          dependencyVersion: (p, v) => Promise.resolve(v),
+          packageVersions: () => Promise.resolve(['0.4.0', '0.5.0'])
+        }
+        return expect(API.pinpointSequenceVersions(['a', 'b'], provider))
+          .to.eventually.equal('0.5.0')
+      })
     })
   })
 })
