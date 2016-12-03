@@ -1,11 +1,34 @@
+/**
+ * A provider for dependency and package information. This uses the NPM CLI to
+ * query the npm-respository.
+ */
 
 import {exec} from 'child-process-promise'
+import merge from 'lodash/fp/merge'
+import mkdirp from 'mkdirp-then'
 
 const deRange = (versionRange) => {
   var prefix = versionRange[0]
   if (prefix === '~' || prefix === '^') return versionRange.slice(1)
   return versionRange
 }
+
+/**
+ * Install a specific version of the an npm package.
+ * @params {String} dependency The package name
+ * @params {String} version The semver version to install
+ * @params {String} path Where to install the dependency.
+ * @returns {Promise} If the package was successfully installed the promise will resolve otherwise it will
+ *   reject.
+ */
+export const install = (dependency, version, path) => {
+  return mkdirp(path)
+  .then(() => exec('npm i ' + dependency, {cwd: path, env: merge(process.env, {NODE_ENV: 'production'})}))
+}
+
+export const cliInterface = (pkg, version) =>
+  exec('npm view ' + pkg + ((version) ? ('@' + version) : '') + ' bin --json')
+  .then((bins) => bins[Object.keys(bins)[0]]) // rather ugly.. there is no inherent order in an object... so this could be random
 
 /**
  * Get the version of a dependency for a specific package. Returns null if it

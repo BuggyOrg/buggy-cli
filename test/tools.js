@@ -2,50 +2,35 @@
 
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import {exec} from 'child-process-promise'
 import fs from 'fs-extra'
 import {join} from 'path'
 import {tmpdir} from 'os'
 import * as Tools from '../src/tools'
 import semver from 'semver'
+import * as Npm from '../src/npm/cliCommands'
+import cuid from 'cuid'
 
 chai.use(chaiAsPromised)
 var expect = chai.expect
 
-const runProgram = (program, args, data) => {
-  var execProm = exec(program, args)
-  var cp = execProm.childProcess
-  if (data) {
-    if (typeof data !== 'string') {
-      data = JSON.stringify(data)
-    }
-    cp.stdin.write(data)
-  }
-  cp.stdin.end()
-  return execProm
-}
-
-const runCLI = (args, data) => {
-  return runProgram('node lib/cli ', args, data)
-}
+const osTmpdir = () =>
+  join(tmpdir(), cuid())
 
 // Make sure not to delete the contents of the real BUGGY_LOCAL_PATH
 // before the first test!
-process.env.BUGGY_LOCAL_PATH = ''
-
-var testCounter = 1
+process.env.BUGGY_LOCAL_PATH = osTmpdir()
 
 describe('Buggy CLI - Tools', function () {
-  describe('Package initialization', function () {
-    this.timeout(10000)
+  describe.only('Package initialization', function () {
+    this.timeout(15000)
     beforeEach(() => {
-      process.env.BUGGY_LOCAL_PATH = join(tmpdir(), '' + testCounter++)
+      process.env.BUGGY_LOCAL_PATH = osTmpdir()
       fs.removeSync(Tools.cachePath())
     })
 
-    afterEach(() => {
+    /* afterEach(() => {
       fs.removeSync(Tools.cachePath())
-    })
+    }) */
 
     it('Successfully Initializes a new buggy cache', () => {
       return Tools.init()
@@ -63,11 +48,11 @@ describe('Buggy CLI - Tools', function () {
 
     it('Installs dependencies into the local path', function () {
       this.timeout(40000)
-      return Tools.install('@buggyorg/graphtools@0.4.0-pre.7')
+      return Tools.install('@buggyorg/graphtools', '0.4.0-pre.7', Npm)
       .then(() => Tools.listTools())
       .then((tools) => {
         expect(tools).to.have.length(1)
-        expect(tools[0].name).to.equal('@buggyorg/graphtools')
+        expect(tools[0].module).to.equal('@buggyorg/graphtools')
         expect(semver.satisfies('0.4.0-pre.7', tools[0].version)).to.be.true
       })
     })

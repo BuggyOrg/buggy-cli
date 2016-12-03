@@ -2,11 +2,11 @@
  * Gather tools necessary for transformations.
  */
 
-import {join} from 'path'
+import {join, relative} from 'path'
 import os from 'os'
-import mkdirp from 'mkdirp-then'
+// import mkdirp from 'mkdirp-then'
 import {exec} from 'child-process-promise'
-import fs from 'fs'
+import walk from 'walkdir'
 import semver from 'semver'
 
 const systemAppDir = () =>
@@ -25,37 +25,52 @@ const isNPMDependency = (dep) => {
 }
 
 export const init = () => {
-  return mkdirp(buggyDir())
-  .then(() => exec('npm init -f', {cwd: buggyDir()}))
+  return exec('mkdir -p ' + cachePath())
   .then(() => true)
 }
 
-const dependenciesToArray = (deps) =>
-  Object.keys(deps).map((d) => ({name: d, version: deps[d]}))
-
-const getPackageJson = (path) =>
-  JSON.parse(fs.readFileSync(join(path, 'package.json')))
+const toTool = (path) => {
+  var splitted = path.split('/')
+  if (splitted.length <= 1) {
+    return null
+  } else if (splitted[0][0] === '@' && splitted[2] && semver.valid(splitted[2])) {
+    return {module: splitted[0] + '/' + splitted[1], version: splitted[2]}
+  } else if (splitted[1] && semver.valid(splitted[1])) {
+    return {module: splitted[0], version: splitted[1]}
+  } else return null
+}
 
 export const listTools = () => {
   return init()
-  .then(() => dependenciesToArray(getPackageJson(buggyDir()).dependencies || {}))
+  .then(() => walk.sync(cachePath(), {max_depth: 3})
+    .map((p) => relative(cachePath(), p))
+    .map(toTool)
+    .filter((t) => t))
 }
 
-const installNPM = (dependency) => {
-  return exec('npm i --save ' + dependency, {cwd: buggyDir()})
-}
+export const dependencyPath = (dependency, version) =>
+  join(cachePath(), dependency, version)
 
-export const install = (dependency) => {
+export const install = (dependency, version, provider) => {
   return init()
   .then(() => isNPMDependency(dependency))
   .then((isNPM) => {
     if (isNPM) {
-      return installNPM(dependency)
+      var depPath = dependencyPath(dependency, version)
+      return provider.install(dependency, version, depPath)
     } else {
-      throw new Error('Cannot install ' + dependency)
+      throw new Error('Cannot install ' + dependency + '@' + version)
     }
   })
 }
+
+export const exectue = (tool, input) => {
+  return 
+}
+
+/* ### use API directly.. in the future... ###
+const getPackageJson = (path) =>
+  JSON.parse(fs.readFileSync(join(path, 'package.json')))
 
 export const entryPoint = (dependency) => {
   return listTools()
@@ -75,6 +90,7 @@ export const toolAPI = (dependency) => {
   .then((entry) => exec('node -e "console.log(JSON.stringify(require(\'' + entry + '\').buggyApi()))"'))
   .then((res) => JSON.parse(res.stdout))
 }
+*/
 
 /**
  * Gets a list of versions for a package.
@@ -99,6 +115,17 @@ export const gatherVersions = (pkg, provider) =>
  */
 export const graphtoolDependency = (pkg, version, provider) =>
   provider.dependencyVersion(pkg, version, '@buggyorg/graphtools')
+
+/**
+ * Get the cli interface for the tool.
+ * @param {String} pkg Name of the package.
+ * @param {String} version Semver version of the package. Use null for default package version.
+ * @param {Provider} provider A source for the dependency information. This could be a npm-provider that
+ *  looks into the npm-registry.
+ * @returns {Promise<String>} The path to the CLI tool relative the to package.
+ */
+export const cliInterface = (pkg, version, provider) =>
+  provider.cliInterface(pkg, version)
 
 const atLeastSemver = (version, least) =>
   version == null || !least || semver.gte(version, least)

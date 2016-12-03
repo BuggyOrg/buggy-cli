@@ -34,7 +34,7 @@ describe('Buggy API', () => {
         })
       })
 
-      it('Accepts finds a version for a sequence', () => {
+      it('Finds a graphtools version for a sequence', () => {
         var provider = {
           dependencyVersion: (p, v) => Promise.resolve(v),
           packageVersions: () => Promise.resolve(['0.4.0', '0.5.0'])
@@ -42,6 +42,12 @@ describe('Buggy API', () => {
         return expect(API.pinpointSequenceVersions(['a', 'b'], provider))
           .to.eventually.equal('0.5.0')
       })
+    })
+  })
+
+  describe('Runner', () => {
+    it('Runs the tools in the tool chain', () => {
+      
     })
   })
 })
