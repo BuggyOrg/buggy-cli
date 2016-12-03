@@ -45,7 +45,7 @@ describe('Buggy API', () => {
     })
   })
 
-  describe.only('Runner', () => {
+  describe('Runner', () => {
     it('Runs the tools in the tool chain', () => {
       return expect(API.runToolChain([
         {module: 'echo', version: '1.0.0', args: 'testString'},

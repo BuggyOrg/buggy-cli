@@ -58,35 +58,6 @@ describe('Buggy CLI - Tools', function () {
     })
   })
 
-  describe('Working with packages', function () {
-    this.timeout(10000)
-    beforeEach(() => {
-      process.env.BUGGY_LOCAL_PATH = join(tmpdir(), '' + testCounter++)
-      fs.removeSync(Tools.cachePath())
-      fs.mkdirpSync(Tools.cachePath())
-      fs.copySync('./test/fixtures/baseCache/', Tools.cachePath())
-    })
-
-    afterEach(() => {
-      fs.removeSync(Tools.cachePath())
-    })
-
-    it('Successfully gets the entry point for a package', () => {
-      return Tools.entryPoint('test')
-      .then((entry) => {
-        expect(entry).to.match(/test\/index.js$/)
-      })
-    })
-
-    it('Gets the API for an package', () => {
-      return Tools.toolAPI('test')
-      .then((api) => {
-        expect(api).to.be.an('object')
-        expect(api.name).to.equal('test')
-      })
-    })
-  })
-
   describe('Package meta queries', () => {
     // dummy provider creator
     const provider = (dep, pkgs) => ({
