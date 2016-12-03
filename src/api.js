@@ -3,6 +3,7 @@ import * as Tools from './toolchain'
 import * as ToolAPI from './tools'
 import flatten from 'lodash/fp/flatten'
 import uniq from 'lodash/fp/uniq'
+import extend from 'lodash/fp/extend'
 import {compare} from 'semver'
 
 function createToolchain (tools) {
@@ -46,6 +47,11 @@ export function allValidVersions (sequence, provider) {
   )
 }
 
+function firstValid (tool, basicVersion, provider) {
+  return ToolAPI.validToolVersions(tool, provider)
+  .then((tools) => tools.find((tool) => ToolAPI.satisfies(tool, basicVersion, provider)))
+}
+
 function checkVersion (sequence, version, provider) {
   return Promise.all(sequence.map((tool) => ToolAPI.satisfies(tool, version, provider)))
   .then((sats) => sats.every((s) => s)) // Check if all tools satisfy the graphtools version.
@@ -63,4 +69,15 @@ function checkVersions (sequence, versions, provider) {
 export function pinpointSequenceVersions (sequence, provider) {
   return allValidVersions(sequence, provider)
   .then((versions) => checkVersions(sequence, versions, provider))
+}
+
+export function prepareToolchain (sequence, provider) {
+  return pinpointSequenceVersions(sequence, provider)
+  .then((version) => Promise.all(sequence.map((tool) => firstValid(tool, version, provider))))
+}
+
+export function runToolChain (toolchain, data, provider) {
+  if (toolchain.length === 0) return Promise.resolve(data)
+  return ToolAPI.execute(toolchain[0], data, provider)
+  .then((res) => runToolChain(toolchain.slice(1), res, provider))
 }

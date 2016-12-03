@@ -21,7 +21,7 @@ const osTmpdir = () =>
 process.env.BUGGY_LOCAL_PATH = osTmpdir()
 
 describe('Buggy CLI - Tools', function () {
-  describe.only('Package initialization', function () {
+  describe('Package initialization', function () {
     this.timeout(15000)
     beforeEach(() => {
       process.env.BUGGY_LOCAL_PATH = osTmpdir()
@@ -143,6 +143,26 @@ describe('Buggy CLI - Tools', function () {
         .then((tool) => {
           expect(tool[0].graphtools).to.not.be.ok
         }))
+    })
+
+    describe('Execution', () => {
+      it('Can execute a cli tool', () => {
+        var provider = {cliInterface: () => Promise.resolve('cat')}
+        return expect(Tools.execute({module: 'a', version: '1.0.0'}, 'abc', provider))
+        .to.eventually.equal('abc')
+      })
+
+      it('Fails if program fails', () => {
+        var provider = {cliInterface: () => Promise.resolve('grep')} // grep without arguments fails..
+        return expect(Tools.execute({module: 'a', version: '1.0.0'}, 'abc', provider))
+        .to.be.rejected
+      })
+
+      it('Can run a program with a set of arguments', () => {
+        var provider = {cliInterface: () => Promise.resolve('echo')}
+        return expect(Tools.execute({module: 'a', version: '1.0.0', args: ['abc']}, '', provider))
+        .to.eventually.equal('abc')
+      })
     })
   })
 })

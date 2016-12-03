@@ -45,9 +45,21 @@ describe('Buggy API', () => {
     })
   })
 
-  describe('Runner', () => {
+  describe.only('Runner', () => {
     it('Runs the tools in the tool chain', () => {
-      
+      return expect(API.runToolChain([
+        {module: 'echo', version: '1.0.0', args: 'testString'},
+        {module: 'cat', version: '1.0.0'}
+      ], '', {cliInterface: (prog) => Promise.resolve(prog)}))
+      .to.eventually.equal('testString')
+    })
+
+    it('Captures the error message if a tool fails', () => {
+      return expect(API.runToolChain([
+        {module: 'echo', version: '1.0.0', args: 'testString'},
+        {module: 'grep', version: '1.0.0'}
+      ], '', {cliInterface: (prog) => Promise.resolve(prog)}))
+      .to.eventually.be.rejectedWith(/grep/)
     })
   })
 })

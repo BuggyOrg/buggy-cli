@@ -6,6 +6,7 @@
 import {exec} from 'child-process-promise'
 import merge from 'lodash/fp/merge'
 import mkdirp from 'mkdirp-then'
+import {join} from 'path'
 
 const deRange = (versionRange) => {
   var prefix = versionRange[0]
@@ -26,9 +27,9 @@ export const install = (dependency, version, path) => {
   .then(() => exec('npm i ' + dependency, {cwd: path, env: merge(process.env, {NODE_ENV: 'production'})}))
 }
 
-export const cliInterface = (pkg, version) =>
+export const cliInterface = (pkg, version, path) =>
   exec('npm view ' + pkg + ((version) ? ('@' + version) : '') + ' bin --json')
-  .then((bins) => bins[Object.keys(bins)[0]]) // rather ugly.. there is no inherent order in an object... so this could be random
+  .then((bins) => join(path, bins[Object.keys(bins)[0]])) // rather ugly.. there is no inherent order in an object... so this could be random
 
 /**
  * Get the version of a dependency for a specific package. Returns null if it

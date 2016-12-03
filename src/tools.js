@@ -3,8 +3,9 @@
  */
 
 import {join, relative} from 'path'
+import extend from 'lodash/fp/extend'
 import os from 'os'
-// import mkdirp from 'mkdirp-then'
+import mkdirp from 'mkdirp-then'
 import {exec} from 'child-process-promise'
 import walk from 'walkdir'
 import semver from 'semver'
@@ -25,7 +26,7 @@ const isNPMDependency = (dep) => {
 }
 
 export const init = () => {
-  return exec('mkdir -p ' + cachePath())
+  return mkdirp(cachePath())
   .then(() => true)
 }
 
@@ -64,8 +65,21 @@ export const install = (dependency, version, provider) => {
   })
 }
 
-export const exectue = (tool, input) => {
-  return 
+export const execute = (tool, input, provider) => {
+  return provider.cliInterface(tool.module, tool.version, dependencyPath(tool.module, tool.version))
+  .then((bin) => {
+    var args = []
+    if (typeof (tool.args) === 'string') {
+      args = tool.args
+    } else if (Array.isArray(tool.args)) {
+      args = tool.args.join(' ')
+    }
+    var binExec = exec(bin + ' ' + args)
+    binExec.childProcess.stdin.write(input)
+    binExec.childProcess.stdin.end()
+    return binExec
+  })
+  .then((result) => result.stdout.trim())
 }
 
 /* ### use API directly.. in the future... ###
@@ -153,7 +167,7 @@ export const validToolVersions = (tool, provider) =>
   .then((versions) => versions.filter((v) => atLeastSemver(v, tool.minVersion)))
   .then((versions) =>
     Promise.all(versions.map((version) => graphtoolDependency(tool.module, version, provider)
-    .then((gtVersion) => ({tool, version, graphtools: gtVersion})))))
+    .then((gtVersion) => extend(tool, {version, graphtools: gtVersion})))))
   .then((versions) => versions.filter((vs) => validGraphtoolsVersion(vs.graphtools)))
 
 /**

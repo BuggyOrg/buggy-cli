@@ -3,7 +3,8 @@
 
 import * as Toolchain from './toolchain'
 import * as npm from './npm/cliCommands'
-import {pinpointSequenceVersions} from './api'
+import {prepareToolchain} from './api'
+import {fancyToolchain} from './format'
 
 /*
 gatherVersions('@buggyorg/graphtools')
@@ -17,6 +18,7 @@ validToolVersions(Toolchain.lisgy)
 .then((versions) => console.log(versions))
 */
 
-pinpointSequenceVersions([Toolchain.lisgy, Toolchain.portgraph2kgraph, Toolchain.graphify], npm)
+prepareToolchain([Toolchain.lisgy, Toolchain.portgraph2kgraph, Toolchain.graphify], npm)
+.then((res) => fancyToolchain(res))
 .then((res) => console.log(res))
 .catch((err) => console.error(err))
