@@ -3,6 +3,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import * as API from '../src/api'
+import * as NPM from '../src/npm/cliCommands'
 
 chai.use(chaiAsPromised)
 var expect = chai.expect
@@ -60,6 +61,13 @@ describe('Buggy API', () => {
         {module: 'grep', version: '1.0.0'}
       ], '', {cliInterface: (prog) => Promise.resolve(prog)}))
       .to.eventually.be.rejectedWith(/grep/)
+    })
+
+    it.only('Can run an installed package', function () {
+      this.timeout(15000)
+      return expect(API.prepareToolchain([{module: '@buggyorg/portgraph2kgraph'}], NPM)
+      .then((toolchain) => API.runToolChain(toolchain, '{"nodes": [], "edges": []}', NPM)))
+      .to.be.fulfilled
     })
   })
 })

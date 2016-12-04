@@ -49,7 +49,7 @@ export function allValidVersions (sequence, provider) {
 
 function firstValid (tool, basicVersion, provider) {
   return ToolAPI.validToolVersions(tool, provider)
-  .then((tools) => tools.find((tool) => ToolAPI.satisfies(tool, basicVersion, provider)))
+  .then((tools) => tools.reverse().find((tool) => ToolAPI.satisfies(tool, basicVersion, provider)))
 }
 
 function checkVersion (sequence, version, provider) {
@@ -74,6 +74,8 @@ export function pinpointSequenceVersions (sequence, provider) {
 export function prepareToolchain (sequence, provider) {
   return pinpointSequenceVersions(sequence, provider)
   .then((version) => Promise.all(sequence.map((tool) => firstValid(tool, version, provider))))
+  .then((toolchain) => Promise.all(toolchain.map((tool) => ToolAPI.install(tool.module, tool.version, provider)))
+    .then(() => toolchain))
 }
 
 export function runToolChain (toolchain, data, provider) {

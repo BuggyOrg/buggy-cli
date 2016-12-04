@@ -29,6 +29,7 @@ export const install = (dependency, version, path) => {
 
 export const cliInterface = (pkg, version, path) =>
   exec('npm view ' + pkg + ((version) ? ('@' + version) : '') + ' bin --json')
+  .then((res) => JSON.parse(res.stdout))
   .then((bins) => join(path, bins[Object.keys(bins)[0]])) // rather ugly.. there is no inherent order in an object... so this could be random
 
 /**
