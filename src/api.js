@@ -74,7 +74,7 @@ export function pinpointSequenceVersions (sequence, provider) {
 export function prepareToolchain (sequence, provider) {
   return pinpointSequenceVersions(sequence, provider)
   .then((version) => Promise.all(sequence.map((tool) => firstValid(tool, version, provider))))
-  .then((toolchain) => Promise.all(toolchain.map((tool) => ToolAPI.install(tool.module, tool.version, provider)))
+  .then((toolchain) => Promise.all(toolchain.map((tool) => ToolAPI.install(tool, provider)))
     .then(() => toolchain))
 }
 

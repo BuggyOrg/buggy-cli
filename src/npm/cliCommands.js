@@ -23,8 +23,13 @@ const deRange = (versionRange) => {
  *   reject.
  */
 export const install = (dependency, version, path) => {
+  var opts = {cwd: path, env: merge(process.env, {NODE_ENV: 'production'})}
   return mkdirp(path)
-  .then(() => exec('npm i ' + dependency, {cwd: path, env: merge(process.env, {NODE_ENV: 'production'})}))
+  .then(() => exec('npm pack ' + dependency + '@' + version, opts))
+  .then((res) => res.stdout.trim())
+  .then((tar) => exec('tar -xzf ' + tar + ' --strip-components=1 package', opts).then(() => tar))
+  .then((tar) => exec('rm ' + tar, opts))
+  .then(() => exec('npm i', opts))
 }
 
 export const cliInterface = (pkg, version, path) =>

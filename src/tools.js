@@ -52,15 +52,15 @@ export const listTools = () => {
 export const dependencyPath = (dependency, version) =>
   join(cachePath(), dependency, version)
 
-export const install = (dependency, version, provider) => {
+export const install = (tool, provider) => {
   return init()
-  .then(() => isNPMDependency(dependency))
+  .then(() => isNPMDependency(tool.module))
   .then((isNPM) => {
     if (isNPM) {
-      var depPath = dependencyPath(dependency, version)
-      return provider.install(dependency, version, depPath)
+      var depPath = dependencyPath(tool.module, tool.version)
+      return provider.install(tool.module, tool.version, depPath)
     } else {
-      throw new Error('Cannot install ' + dependency + '@' + version)
+      throw new Error('Cannot install ' + tool.module + '@' + tool.version)
     }
   })
 }
@@ -74,7 +74,7 @@ export const execute = (tool, input, provider) => {
     } else if (Array.isArray(tool.args)) {
       args = tool.args.join(' ')
     }
-    var binExec = exec(bin + ' ' + args)
+    var binExec = exec(((tool.noNode) ? '' : 'node ') + bin + ' ' + args)
     binExec.childProcess.stdin.write(input)
     binExec.childProcess.stdin.end()
     return binExec

@@ -49,22 +49,22 @@ describe('Buggy API', () => {
   describe('Runner', () => {
     it('Runs the tools in the tool chain', () => {
       return expect(API.runToolChain([
-        {module: 'echo', version: '1.0.0', args: 'testString'},
-        {module: 'cat', version: '1.0.0'}
+        {module: 'echo', version: '1.0.0', args: 'testString', noNode: true},
+        {module: 'cat', version: '1.0.0', noNode: true}
       ], '', {cliInterface: (prog) => Promise.resolve(prog)}))
       .to.eventually.equal('testString')
     })
 
     it('Captures the error message if a tool fails', () => {
       return expect(API.runToolChain([
-        {module: 'echo', version: '1.0.0', args: 'testString'},
-        {module: 'grep', version: '1.0.0'}
+        {module: 'echo', version: '1.0.0', args: 'testString', noNode: true},
+        {module: 'grep', version: '1.0.0', noNode: true}
       ], '', {cliInterface: (prog) => Promise.resolve(prog)}))
       .to.eventually.be.rejectedWith(/grep/)
     })
 
-    it.only('Can run an installed package', function () {
-      this.timeout(15000)
+    it('Can run an installed package', function () {
+      this.timeout(40000)
       return expect(API.prepareToolchain([{module: '@buggyorg/portgraph2kgraph'}], NPM)
       .then((toolchain) => API.runToolChain(toolchain, '{"nodes": [], "edges": []}', NPM)))
       .to.be.fulfilled

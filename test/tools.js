@@ -48,7 +48,7 @@ describe('Buggy CLI - Tools', function () {
 
     it('Installs dependencies into the local path', function () {
       this.timeout(40000)
-      return Tools.install('@buggyorg/graphtools', '0.4.0-pre.7', Npm)
+      return Tools.install({module: '@buggyorg/graphtools', version: '0.4.0-pre.7'}, Npm)
       .then(() => Tools.listTools())
       .then((tools) => {
         expect(tools).to.have.length(1)
@@ -119,19 +119,19 @@ describe('Buggy CLI - Tools', function () {
     describe('Execution', () => {
       it('Can execute a cli tool', () => {
         var provider = {cliInterface: () => Promise.resolve('cat')}
-        return expect(Tools.execute({module: 'a', version: '1.0.0'}, 'abc', provider))
+        return expect(Tools.execute({module: 'a', version: '1.0.0', noNode: true}, 'abc', provider))
         .to.eventually.equal('abc')
       })
 
       it('Fails if program fails', () => {
         var provider = {cliInterface: () => Promise.resolve('grep')} // grep without arguments fails..
-        return expect(Tools.execute({module: 'a', version: '1.0.0'}, 'abc', provider))
+        return expect(Tools.execute({module: 'a', version: '1.0.0', noNode: true}, 'abc', provider))
         .to.be.rejected
       })
 
       it('Can run a program with a set of arguments', () => {
         var provider = {cliInterface: () => Promise.resolve('echo')}
-        return expect(Tools.execute({module: 'a', version: '1.0.0', args: ['abc']}, '', provider))
+        return expect(Tools.execute({module: 'a', version: '1.0.0', args: ['abc'], noNode: true}, '', provider))
         .to.eventually.equal('abc')
       })
     })
