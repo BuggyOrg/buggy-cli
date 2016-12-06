@@ -2,23 +2,38 @@
 /* global __dirname, process */
 
 import * as Toolchain from './toolchain'
-import * as npm from './npm/cliCommands'
+import * as NPM from './npm/cliCommands'
 import {prepareToolchain} from './api'
-import {fancyToolchain} from './format'
+import * as ToolAPI from './tools'
+import * as Format from './format'
+import yargs from 'yargs'
+import chalk from 'chalk'
+import cliExt from 'cli-ext'
 
 /*
-gatherVersions('@buggyorg/graphtools')
-  .then((versions) => versions.filter(validGraphtoolsVersion))
-  .then((versions) => console.log(versions))
-  .catch((err) => console.error(err))
-*/
-
-/*
-validToolVersions(Toolchain.lisgy)
-.then((versions) => console.log(versions))
-*/
-
 prepareToolchain([Toolchain.lisgy, Toolchain.portgraph2kgraph, Toolchain.graphify], npm)
 .then((res) => fancyToolchain(res))
 .then((res) => console.log(res))
 .catch((err) => console.error(err))
+*/
+
+var wasCommand = false
+
+const command = (fn) => {
+  return function (...args) {
+    wasCommand = true
+    fn(...args)
+  }
+}
+
+var argv = yargs
+  .alias('f', 'from')
+  .alias('t', 'to')
+  .command('list-inputs', 'List all available input types', command(() => console.log(Format.tools(ToolAPI.inputs(Toolchain)))))
+  .argv
+
+// process input the 0-th argument will be the file name..?
+if (!wasCommand) {
+  cliExt.input(argv._[0])
+  .then((input) => {})
+}

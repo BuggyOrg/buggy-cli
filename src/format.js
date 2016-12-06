@@ -21,3 +21,11 @@ export const fancyToolchain = (toolchain) => {
 }
 
 export const normalToolchain = (toolchain) => 'Install `graph-easy` to view the high quality output\n\n' + (toolchain)
+
+export const tool = (t) => {
+  return JSON.stringify(t, null, 2)
+}
+
+export const tools = (ts) => {
+  return ts.map(tool).join('\n\n')
+}

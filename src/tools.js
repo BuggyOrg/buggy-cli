@@ -50,7 +50,7 @@ export const listTools = () => {
 }
 
 export const dependencyPath = (dependency, version) =>
-  join(cachePath(), dependency, version)
+  (dependency && version) ? join(cachePath(), dependency, version) : ''
 
 export const install = (tool, provider) => {
   return init()
@@ -66,6 +66,10 @@ export const install = (tool, provider) => {
 }
 
 export const execute = (tool, input, provider) => {
+  return run(tool, input, '$<bin> $<args>', provider)
+}
+
+export const run = (tool, input, execString, provider) => {
   return provider.cliInterface(tool.module, tool.version, dependencyPath(tool.module, tool.version))
   .then((bin) => {
     var args = []
@@ -74,8 +78,11 @@ export const execute = (tool, input, provider) => {
     } else if (Array.isArray(tool.args)) {
       args = tool.args.join(' ')
     }
-    var binExec = exec(((tool.noNode) ? '' : 'node ') + bin + ' ' + args)
-    binExec.childProcess.stdin.write(input)
+    const execution = execString.replace('$<bin>', bin).replace('$<input>', input).replace('$<args>', args)
+    var binExec = exec(((tool.noNode) ? '' : 'node ') + execution)
+    if (execString.indexOf('$<input>') === -1) {
+      binExec.childProcess.stdin.write(input)
+    }
     binExec.childProcess.stdin.end()
     return binExec
   })
@@ -150,7 +157,7 @@ const atLeastSemver = (version, least) =>
  * @params {String} version A Semver string of the version to test.
  * @returns {boolean} True if the version is at least 0.4.0-pre.7, false otherwise.
  */
-export const validGraphtoolsVersion = (version) => 
+export const validGraphtoolsVersion = (version) =>
   atLeastSemver(version, '0.4.0-pre.7') // we currently want to match 0.4.0-pre.7 too
 
 /**
@@ -186,4 +193,8 @@ export const satisfies = (tool, version, provider) => {
     .then((gtVersion) =>
       Promise.resolve(atLeastSemver(gtVersion, version)))
   }
+}
+
+export function inputs (toolchain) {
+  return Object.keys(toolchain).map((k) => toolchain[k]).filter((tool) => tool.consumes.includes('input'))
 }

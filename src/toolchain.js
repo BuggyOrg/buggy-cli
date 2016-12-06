@@ -3,23 +3,73 @@
  */
 
 export const lisgy = {
+  name: 'Lisgy',
   module: '@buggyorg/lisgy',
   minVersion: '0.2.0-pre.0',
+  consumes: ['input'],
   produces: ['portgraph'],
-  consumes: ['lisgy']
+  activatedBy: ['$<bin> pc'],
+  args: '$<bin> pc'
+}
+
+export const json = {
+  name: 'JSON-Parse',
+  consumes: ['input'],
+  produces: ['portgraph'],
+  activatedBy: [(input) => {
+    try {
+      JSON.parse(input)
+      return true
+    } catch (err) { return false }
+  }]
 }
 
 export const portgraph2kgraph = {
+  name: 'Portgraph2KGraph',
   module: '@buggyorg/portgraph2kgraph',
-  produces: ['kgraph'],
-  consumes: ['portgraph']
+  consumes: ['portgraph'],
+  produces: ['kgraph']
 }
 
 export const graphify = {
+  name: 'Graphify',
   module: '@buggyorg/graphify',
+  consumes: ['kgraph'],
+  produces: ['svg']
+}
 
-  minVersion: '0.1.25', //TODO FIX THIS: This constraint is only for test purposes!
+export const resolve = {
+  module: '@buggyorg/resolve',
+  consumes: ['portgraph'],
+  produces: ['portgraph'],
+  activatedBy: ['resolve']
+}
 
-  produces: ['svg'],
-  consumes: ['kgraph']
+export const typify = {
+  module: '@buggyorg/typify',
+  consumes: ['portgraph'],
+  produces: ['portgraph'],
+  depends: ['resolve'],
+  activatedBy: ['typify']
+}
+
+export const optimize = {
+  module: '@buggyorg/nitro',
+  consumes: ['portgraph'],
+  produces: ['portgraph'],
+  depends: ['typify'],
+  activatedBy: ['optimize']
+}
+
+export const gogen = {
+  module: '@buggyorg/codegen',
+  consumes: ['portgraph'],
+  produces: ['go'],
+  depends: ['typify']
+}
+
+export const target = {
+  consumes: ['svg'],
+  target: ['final_product'],
+  depends: ['typify']
 }

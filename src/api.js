@@ -6,7 +6,7 @@ import uniq from 'lodash/fp/uniq'
 import extend from 'lodash/fp/extend'
 import {compare} from 'semver'
 
-function createToolchain (tools) {
+function createToolchain (from, to, tools) {
   const toolchain = new Graph({ directed: true })
   Object.keys(tools).forEach((name) => toolchain.setNode(name, tools[name]))
   tools.forEach((nameA) => {
@@ -35,6 +35,10 @@ export function getToolSequence (from, to, tools = Tools) {
 
   const dijkstra = alg.dijkstra(toolchain, startNode)
   
+}
+
+export function getDynamicToolSequence (input, to, tools = Tools) {
+  var inputTool = ToolAPI.matchingInputTool(input, tools)
 }
 
 export function allValidVersions (sequence, provider) {
