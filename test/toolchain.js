@@ -28,7 +28,7 @@ describe('Buggy CLI - Toolchain', function () {
       .then((matching) => expect(matching[0].name).to.equal('tool1'))
     })
 
-    it.only('Selects input by CLI', () => {
+    it('Selects input by CLI', () => {
       const toolchain = {
         tool1: {name: 'tool1', activatedBy: 'grep', consumes: ['input'], noNode: true},
         tool2: {name: 'tool2', activatedBy: 'echo $<input>', consumes: ['input'], noNode: true}
@@ -70,6 +70,62 @@ describe('Buggy CLI - Toolchain', function () {
       }
       expect(() => ToolchainGen.outputDependencies({depends: ['B'], name: 'A'}, toolchain, {}))
       .to.throw(/cycles/)
+    })
+  })
+
+  describe.only('Connecting sequence', () => {
+    it('Can ignore already connected sequences', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: '-', produces: 'data'},
+        B: {name: 'B', consumes: 'data', produces: '--'}
+      }
+      var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
+      expect(newSeq).to.eql(['A', 'B'])
+    })
+
+    it('Can connect tools of different types', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: '-', produces: 'outA'},
+        B: {name: 'B', consumes: 'inB', produces: '--'},
+        transform: {name: 'transform', consumes: 'outA', produces: 'inB'}
+      }
+      var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
+      expect(newSeq).to.eql(['A', 'transform', 'B'])
+    })
+
+    it('Throws an exception if it is not possible to connect the two processes', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: '-', produces: 'outA'},
+        B: {name: 'B', consumes: 'inB', produces: '--'},
+        transform: {name: 'transform', consumes: 'inA', produces: 'inB'}
+      }
+      expect(() => ToolchainGen.connectTools(['A', 'B'], toolchain))
+      .to.throw(Error)
+    })
+
+    it('Can handle multiple connections', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: '-', produces: 'outA'},
+        B: {name: 'B', consumes: 'inB', produces: '--'},
+        C: {name: 'C', consumes: 'inC', produces: 'outC'},
+        transform: {name: 'transform', consumes: 'outA', produces: 'inB'},
+        transform2: {name: 'transform2', consumes: 'outA', produces: 'inC'},
+        transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'}
+      }
+      var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
+      expect(newSeq).to.eql(['A', 'transform', 'B'])
+    })
+
+    it('Can handle longer connections', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: '-', produces: 'outA'},
+        B: {name: 'B', consumes: 'inB', produces: '--'},
+        C: {name: 'C', consumes: 'inC', produces: 'outC'},
+        transform2: {name: 'transform2', consumes: 'outA', produces: 'inC'},
+        transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'}
+      }
+      var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
+      expect(newSeq).to.eql(['A', 'transform2', 'C', 'transform3', 'B'])
     })
   })
 })

@@ -80,10 +80,12 @@ export const run = (tool, input, execString, provider) => {
     }
     const execution = execString.replace('$<bin>', bin).replace('$<input>', input).replace('$<args>', args)
     var binExec = exec(((tool.noNode) ? '' : 'node ') + execution)
-    if (execString.indexOf('$<input>') === -1) {
-      binExec.childProcess.stdin.write(input)
-    }
-    binExec.childProcess.stdin.end()
+    setTimeout(() => { // does not work without this on my home pc
+      if (execString.indexOf('$<input>') === -1 && !binExec.childProcess.stdin.destroyed) {
+        binExec.childProcess.stdin.write(input)
+      }
+      binExec.childProcess.stdin.end()
+    }, 10)
     return binExec
   })
   .then((result) => result.stdout.trim())

@@ -81,3 +81,56 @@ export function outputDependencies (output, tools = Toolchain, provider) {
   checkCycles(depGraph)
   return alg.topsort(depGraph).reverse()
 }
+
+const betweenPairs = (callback, sequence) => {
+  return sequence.reduce((acc, cur) => {
+    if (acc.length === 0) return [cur]
+    else {
+      var prev = acc[acc.length - 1]
+      return acc.concat(callback(prev, cur), [cur])
+    }
+  }, [])
+}
+
+function createToolchainGraph (tools) {
+  const toolchain = new Graph({ directed: true })
+  Object.keys(tools).forEach((name) => toolchain.setNode(name, tools[name]))
+  Object.keys(tools).forEach((nameA) => {
+    const toolA = tools[nameA]
+
+    Object.keys(tools).forEach((nameB) => {
+      const toolB = tools[nameB]
+      if (toolA.produces === toolB.consumes) {
+        toolchain.setEdge(nameA, nameB)
+      }
+    })
+  })
+  return toolchain
+}
+
+export function toolSequence (from, to, toolGraph) {
+  const paths = alg.dijkstra(toolGraph, from)
+  var path = []
+  var cur = to
+  while (cur && cur !== from) {
+    path.push(cur)
+    cur = paths[cur].predecessor
+  }
+  if(!cur) {
+    throw new Error('No transformation possible from ' + from + ' to ' + to)
+  }
+  return path.reverse().slice(0, -1)
+}
+
+/**
+ * Creates a processable sequence of tools in which each output of a tool
+ * fits the input of the next tool.
+ * @param {Array<Tool>} sequence A tool sequence that is not yet processable.
+ * @param {Toolchain} tools A toolchain to resolve missing transformation tools.
+ * @returns {Array<Tool>} A valid tool sequence that can be processed to create an output.
+ */
+export function connectTools (sequence, tools) {
+  var graph = createToolchainGraph(tools)
+  var newTools = betweenPairs((prev, cur) => toolSequence(prev, cur, graph), sequence)
+  return newTools
+}
