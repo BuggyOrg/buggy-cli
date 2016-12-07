@@ -76,8 +76,34 @@ describe('Buggy API', () => {
       const toolchain = {
         A: {name: 'A', consumes: 'input', produces: 'go', activatedBy: () => true}
       }
-      return expect(API.createSequence('{}', 'go', [], toolchain, {cliInterface: () => 'echo a'}))
+      return expect(API.createSequence('A', 'go', [], toolchain, {cliInterface: () => 'echo a'}))
       .to.eventually.eql(['A'])
+    })
+
+    it('Creates a toolchain for an complex example', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: 'input', produces: 'json', activatedBy: () => true},
+        B: {name: 'B', consumes: 'input', produces: 'json', activatedBy: () => false},
+        C: {name: 'C', consumes: 'json', produces: 'json'},
+        D: {name: 'D', consumes: 'json', produces: 'json', depends: ['C']},
+        E: {name: 'E', consumes: 'json', produces: 'out'},
+        F: {name: 'F', consumes: 'json', produces: '-1-'},
+        G: {name: 'G', consumes: '-1-', produces: 'out'},
+      }
+      return expect(API.createSequence('A', 'out', ['D'], toolchain, {cliInterface: () => 'echo a'}))
+      .to.eventually.eql(['A', 'C', 'D', 'E'])
+    })
+
+    it('Fails if no sequence is available', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: 'input', produces: 'json', activatedBy: () => true},
+        B: {name: 'B', consumes: 'input', produces: 'json', activatedBy: () => false},
+        C: {name: 'C', consumes: 'json', produces: 'json'},
+        D: {name: 'D', consumes: 'json', produces: 'json', depends: ['C']},
+        F: {name: 'F', consumes: 'json', produces: '-1-'},
+      }
+      return expect(API.createSequence('A', 'out', ['D'], toolchain, {cliInterface: () => 'echo a'}))
+      .to.be.rejected
     })
   })
 })

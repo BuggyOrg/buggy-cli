@@ -140,8 +140,13 @@ export function connectTools (sequence, tools, provider) {
   return newTools.slice(0, -1)
 }
 
-export function calculateToolchain (input, output, tools, provider) {
+export function calculateToolchainFromInput (input, output, tools, provider) {
   return matchingInputTools(input, tools, provider)
-  .then((inputs) => [inputs[0].name].concat(outputDependencies(output, tools, provider)))
+  .then((inputs) => calculateToolchain(inputs[0], output, tools, provider))
+}
+
+export function calculateToolchain (input, output, tools, provider) {
+  return Promise.resolve(input)
+  .then((input) => [input].concat(outputDependencies(output, tools, provider)))
   .then((sequence) => connectTools(sequence, merge(tools, {output: output}), provider))
 }

@@ -30,10 +30,12 @@ var argv = yargs
   .alias('f', 'from')
   .alias('t', 'to')
   .command('list-inputs', 'List all available input types', command(() => console.log(Format.tools(ToolAPI.inputs(Toolchain)))))
+  .commandDir('cli')
   .argv
 
 // process input the 0-th argument will be the file name..?
 if (!wasCommand) {
   cliExt.input(argv._[0])
   .then((input) => {})
+  .catch(() => {})
 }

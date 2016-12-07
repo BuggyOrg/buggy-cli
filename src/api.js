@@ -2,7 +2,7 @@
 import * as ToolAPI from './tools'
 import flatten from 'lodash/fp/flatten'
 import uniq from 'lodash/fp/uniq'
-import {calculateToolchain} from './toolchainGen'
+import {calculateToolchain, calculateToolchainFromInput} from './toolchainGen'
 import {compare} from 'semver'
 
 export function allValidVersions (sequence, provider) {
@@ -52,6 +52,16 @@ export function runToolChain (toolchain, data, provider) {
   .then((res) => runToolChain(toolchain.slice(1), res, provider))
 }
 
+export function createSequenceFromInput (input, output, args, tools, provider) {
+  const outputTarget = {
+    name: 'output',
+    depends: args,
+    produces: 'artifact',
+    consumes: output
+  }
+  return calculateToolchainFromInput(input, outputTarget, tools, provider)
+}
+
 export function createSequence (input, output, args, tools, provider) {
   const outputTarget = {
     name: 'output',
@@ -60,4 +70,10 @@ export function createSequence (input, output, args, tools, provider) {
     consumes: output
   }
   return calculateToolchain(input, outputTarget, tools, provider)
+}
+
+export function toolchainSequence (input, output, args, tools, provider) {
+  return createSequence(input, output, args, tools, provider)
+  .then((sequence) => sequence.map((v) => tools[v]))
+  .then((sequence) => prepareToolchain(sequence, provider))
 }
