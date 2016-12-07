@@ -17,6 +17,7 @@ import * as Toolchain from './toolchain'
 import * as ToolAPI from './tools'
 import { Graph, alg } from 'graphlib'
 import flatten from 'lodash/fp/flatten'
+import merge from 'lodash/fp/merge'
 
 // function
 
@@ -55,6 +56,10 @@ export function matchingInputTools (input, tools = Toolchain, provider) {
   var inputs = ToolAPI.inputs(tools)
   return Promise.all(inputs.map((tool) => checkInputTool(tool, input, provider)))
   .then((checks) => inputs.filter((_, n) => checks[n]))
+  .then((tools) => {
+    if (tools.length === 0) throw new Error('No input tools available for given input.')
+    else return tools
+  })
 }
 
 function dependencyGraph (graph, outputs, tools, provider) {
@@ -116,7 +121,7 @@ export function toolSequence (from, to, toolGraph) {
     path.push(cur)
     cur = paths[cur].predecessor
   }
-  if(!cur) {
+  if (!cur) {
     throw new Error('No transformation possible from ' + from + ' to ' + to)
   }
   return path.reverse().slice(0, -1)
@@ -129,8 +134,14 @@ export function toolSequence (from, to, toolGraph) {
  * @param {Toolchain} tools A toolchain to resolve missing transformation tools.
  * @returns {Array<Tool>} A valid tool sequence that can be processed to create an output.
  */
-export function connectTools (sequence, tools) {
+export function connectTools (sequence, tools, provider) {
   var graph = createToolchainGraph(tools)
   var newTools = betweenPairs((prev, cur) => toolSequence(prev, cur, graph), sequence)
-  return newTools
+  return newTools.slice(0, -1)
+}
+
+export function calculateToolchain (input, output, tools, provider) {
+  return matchingInputTools(input, tools, provider)
+  .then((inputs) => [inputs[0].name].concat(outputDependencies(output, tools, provider)))
+  .then((sequence) => connectTools(sequence, merge(tools, {output: output}), provider))
 }

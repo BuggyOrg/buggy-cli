@@ -1,45 +1,9 @@
-import { Graph } from 'graphlib'
-import * as Tools from './toolchain'
+
 import * as ToolAPI from './tools'
 import flatten from 'lodash/fp/flatten'
 import uniq from 'lodash/fp/uniq'
-import extend from 'lodash/fp/extend'
+import {calculateToolchain} from './toolchainGen'
 import {compare} from 'semver'
-
-function createToolchain (from, to, tools) {
-  const toolchain = new Graph({ directed: true })
-  Object.keys(tools).forEach((name) => toolchain.setNode(name, tools[name]))
-  tools.forEach((nameA) => {
-    const toolA = tools[nameA]
-    toolchain.setNode(`${toolA.consumes} >`)
-    toolchain.setNode(`> ${toolA.produces}`)
-
-    tools.forEach((nameB) => {
-      const toolB = tools[nameB]
-      if (toolA.produces === toolB.consumes) {
-        toolchain.setEdge(nameA, nameB)
-      }
-    })
-  })
-  return toolchain
-}
-
-export function getToolSequence (from, to, tools = Tools) {
-  const toolchain = createToolchain(tools)
-  const startNode = toolchain.node(`${from} >`)
-  const targetNode = toolchain.node(`> ${to}`)
-
-  if (startNode == null || targetNode == null) {
-    return null
-  }
-
-  const dijkstra = alg.dijkstra(toolchain, startNode)
-  
-}
-
-export function getDynamicToolSequence (input, to, tools = Tools) {
-  var inputTool = ToolAPI.matchingInputTool(input, tools)
-}
 
 export function allValidVersions (sequence, provider) {
   return Promise.all(sequence.map((tool) => ToolAPI.validToolVersions(tool, provider)))
@@ -86,4 +50,14 @@ export function runToolChain (toolchain, data, provider) {
   if (toolchain.length === 0) return Promise.resolve(data)
   return ToolAPI.execute(toolchain[0], data, provider)
   .then((res) => runToolChain(toolchain.slice(1), res, provider))
+}
+
+export function createSequence (input, output, args, tools, provider) {
+  const outputTarget = {
+    name: 'output',
+    depends: args,
+    produces: 'artifact',
+    consumes: output
+  }
+  return calculateToolchain(input, outputTarget, tools, provider)
 }

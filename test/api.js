@@ -70,4 +70,14 @@ describe('Buggy API', () => {
       .to.be.fulfilled
     })
   })
+
+  describe.only('Toolchain generation', () => {
+    it('Creates a toolchain for an input and output', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: 'input', produces: 'go', activatedBy: () => true}
+      }
+      return expect(API.createSequence('{}', 'go', [], toolchain, {cliInterface: () => 'echo a'}))
+      .to.eventually.eql(['A'])
+    })
+  })
 })

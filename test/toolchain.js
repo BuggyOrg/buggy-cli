@@ -73,7 +73,7 @@ describe('Buggy CLI - Toolchain', function () {
     })
   })
 
-  describe.only('Connecting sequence', () => {
+  describe('Connecting sequence', () => {
     it('Can ignore already connected sequences', () => {
       const toolchain = {
         A: {name: 'A', consumes: '-', produces: 'data'},
