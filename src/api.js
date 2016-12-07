@@ -77,3 +77,14 @@ export function toolchainSequence (input, output, args, tools, provider) {
   .then((sequence) => sequence.map((v) => tools[v]))
   .then((sequence) => prepareToolchain(sequence, provider))
 }
+
+export function toolchainSequenceFromInput (input, output, args, tools, provider) {
+  return createSequenceFromInput(input, output, args, tools, provider)
+  .then((sequence) => sequence.map((v) => tools[v]))
+  .then((sequence) => prepareToolchain(sequence, provider))
+}
+
+export function run (input, output, args, tools, provider) {
+  return toolchainSequenceFromInput(input, output, args, tools, provider)
+  .then((sequence) => runToolChain(sequence, input, provider))
+}
