@@ -2,7 +2,7 @@
 import * as Toolchain from '../toolchain'
 import * as Format from '../format'
 import {toolchainSequence} from '../api'
-import * as NPM from '../npm/cliCommands'
+import * as NPM from '../npm/cacheCli'
 
 export const command = 'show-toolchain'
 export const description = 'Show the toolchain to create a given output'

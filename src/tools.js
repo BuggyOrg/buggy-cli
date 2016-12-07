@@ -7,6 +7,7 @@ import extend from 'lodash/fp/extend'
 import os from 'os'
 import mkdirp from 'mkdirp-then'
 import {exec} from 'child-process-promise'
+import fs from 'fs'
 import walk from 'walkdir'
 import semver from 'semver'
 
@@ -58,6 +59,7 @@ export const install = (tool, provider) => {
   .then((isNPM) => {
     if (isNPM) {
       var depPath = dependencyPath(tool.module, tool.version)
+      if (fs.existsSync(depPath)) return Promise.resolve()
       return provider.install(tool.module, tool.version, depPath)
     } else {
       throw new Error('Cannot install ' + tool.module + '@' + tool.version)
