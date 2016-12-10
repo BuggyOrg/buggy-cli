@@ -23,7 +23,7 @@ const buggyDir = () => join(buggyLocal(), 'buggy', require('../package.json').ve
 export const cachePath = buggyDir
 
 const isNPMDependency = (dep) => {
-  return Promise.resolve(true)
+  return Promise.resolve(dep)
 }
 
 export const init = () => {
@@ -62,7 +62,7 @@ export const install = (tool, provider) => {
       if (fs.existsSync(depPath)) return Promise.resolve()
       return provider.install(tool.module, tool.version, depPath)
     } else {
-      throw new Error('Cannot install ' + tool.module + '@' + tool.version)
+      return Promise.resolve()
     }
   })
 }
@@ -124,7 +124,7 @@ export const toolAPI = (dependency) => {
  * @returns {Promise<String[]>} An array of version strings (in Semver format).
  */
 export const gatherVersions = (pkg, provider) =>
-  provider.packageVersions(pkg)
+  provider.packageVersions(pkg.module)
 
 export const latestVersion = (pkg, provider) =>
   gatherVersions(pkg, provider)
@@ -177,7 +177,7 @@ export const validGraphtoolsVersion = (version) =>
  * @returns {Promise<Array>} A tool array of all valid version with added information for the graphtools dependency.
  */
 export const validToolVersions = (tool, provider) =>
-  gatherVersions(tool.module, provider)
+  gatherVersions(tool, provider)
   .then((versions) => versions.filter((v) => atLeastSemver(v, tool.minVersion)))
   .then((versions) =>
     Promise.all(versions.map((version) => graphtoolDependency(tool.module, version, provider)

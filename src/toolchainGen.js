@@ -85,7 +85,7 @@ export function outputDependencies (output, tools = Toolchain, provider) {
   graph.setNode(output.name, output)
   var depGraph = dependencyGraph(graph, [output], tools, provider)
   checkCycles(depGraph)
-  return alg.topsort(depGraph).reverse()
+  return alg.topsort(depGraph).reverse().slice(0, -1).map((t) => tools[t])
 }
 
 const betweenPairs = (callback, sequence) => {
@@ -115,17 +115,24 @@ function createToolchainGraph (tools) {
 }
 
 export function toolSequence (from, to, toolGraph) {
-  const paths = alg.dijkstra(toolGraph, from)
+  const paths = alg.dijkstra(toolGraph, from.name)
   var path = []
-  var cur = to
-  while (cur && cur !== from) {
+  var cur = to.name
+  while (cur && cur !== from.name) {
     path.push(cur)
     cur = paths[cur].predecessor
   }
   if (!cur) {
-    throw new Error('No transformation possible from ' + from + ' to ' + to)
+    throw new Error('No transformation possible from ' + from.name + ' to ' + to.name)
   }
   return path.reverse().slice(0, -1)
+}
+
+function toTools (tools) {
+  return (tool) => {
+    if (typeof tool === 'string') return tools[tool]
+    return tool
+  }
 }
 
 /**
@@ -137,7 +144,7 @@ export function toolSequence (from, to, toolGraph) {
  */
 export function connectTools (sequence, tools, provider) {
   var graph = createToolchainGraph(tools)
-  var newTools = betweenPairs((prev, cur) => toolSequence(prev, cur, graph), sequence)
+  var newTools = betweenPairs((prev, cur) => toolSequence(prev, cur, graph).map(toTools(tools)), sequence)
   return newTools.slice(0, -1)
 }
 
@@ -148,6 +155,6 @@ export function calculateToolchainFromInput (input, output, tools, provider) {
 
 export function calculateToolchain (input, output, tools, provider) {
   return Promise.resolve(input)
-  .then((input) => [input].concat(outputDependencies(output, tools, provider)))
+  .then((input) => [input].concat(outputDependencies(output, tools, provider)).concat([output]))
   .then((sequence) => connectTools(sequence, merge(tools, {output: output}), provider))
 }

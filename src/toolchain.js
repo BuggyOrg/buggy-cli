@@ -3,17 +3,17 @@
  */
 
 export const lisgy = {
-  name: 'Lisgy',
+  name: 'lisgy',
   module: '@buggyorg/lisgy',
   minVersion: '0.2.0-pre.0',
   consumes: 'input',
   produces: 'portgraph',
-  activatedBy: ['$<bin> pc'],
-  args: '$<bin> pc'
+  activatedBy: ['$<bin> $<args>'],
+  args: 'pc'
 }
 
 export const json = {
-  name: 'JSON-Parse',
+  name: 'json',
   consumes: 'input',
   produces: 'portgraph',
   activatedBy: [(input) => {
@@ -25,14 +25,14 @@ export const json = {
 }
 
 export const portgraph2kgraph = {
-  name: 'Portgraph2KGraph',
+  name: 'portgraph2kgraph',
   module: '@buggyorg/portgraph2kgraph',
   consumes: 'portgraph',
   produces: 'kgraph'
 }
 
 export const graphify = {
-  name: 'Graphify',
+  name: 'graphify',
   module: '@buggyorg/graphify',
   consumes: 'kgraph',
   produces: 'svg'

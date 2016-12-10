@@ -38,7 +38,6 @@ var argv = yargs
 if (!wasCommand) {
   cliExt.input(argv._[0])
   .then((input) => {
-    console.log('running for input: ' + input)
     return run(input, argv.to, [], Toolchain, NPM)
   })
   .then((output) => {
