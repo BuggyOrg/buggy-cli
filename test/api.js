@@ -76,8 +76,8 @@ describe('Buggy API', () => {
       const toolchain = {
         A: {name: 'A', consumes: 'input', produces: 'go', activatedBy: () => true}
       }
-      return expect(API.createSequence('A', 'go', [], toolchain, {cliInterface: () => 'echo a'}))
-      .to.eventually.eql(['A'])
+      return API.createSequence(toolchain['A'], 'go', [], toolchain, {cliInterface: () => 'echo a'})
+      .then((sequence) => expect(sequence.map((tool) => tool.name)).to.eql(['A']))
     })
 
     it('Creates a toolchain for an complex example', () => {
@@ -90,8 +90,9 @@ describe('Buggy API', () => {
         F: {name: 'F', consumes: 'json', produces: '-1-'},
         G: {name: 'G', consumes: '-1-', produces: 'out'},
       }
-      return expect(API.createSequence('A', 'out', ['D'], toolchain, {cliInterface: () => 'echo a'}))
-      .to.eventually.eql(['A', 'C', 'D', 'E'])
+      return API.createSequence(toolchain['A'], 'out', ['D'], toolchain, {cliInterface: () => 'echo a'})
+      .then((sequence) => 
+        expect(sequence.map((tool) => tool.name)).to.eql(['A', 'C', 'D', 'E']))
     })
 
     it('Fails if no sequence is available', () => {

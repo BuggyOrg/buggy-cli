@@ -44,8 +44,7 @@ describe('Buggy CLI - Toolchain', function () {
   describe('Dependencies', () => {
     it('Can work with no dependencies', () => {
       var seq = ToolchainGen.outputDependencies({depends: [], name: 'A'}, {}, {})
-      expect(seq).to.have.length(1)
-      expect(seq[0]).to.equal('A')
+      expect(seq).to.have.length(0)
     })
 
     it('Finds a single dependency', () => {
@@ -53,8 +52,8 @@ describe('Buggy CLI - Toolchain', function () {
         B: {name: 'B', depends: []}
       }
       var seq = ToolchainGen.outputDependencies({depends: ['B'], name: 'A'}, toolchain, {})
-      expect(seq).to.have.length(2)
-      expect(seq).to.eql(['B', 'A'])
+      expect(seq).to.have.length(1)
+      expect(seq.map((t) => t.name)).to.eql(['B'])
     })
 
     it('Handles complex dependencies', () => {
@@ -63,7 +62,7 @@ describe('Buggy CLI - Toolchain', function () {
         D: {name: 'D', depends: ['C']}, E: {name: 'E', depends: ['B', 'C']}
       }
       var seq = ToolchainGen.outputDependencies({depends: ['B', 'C'], name: 'A'}, toolchain, {})
-      expect(seq).to.eql(['C', 'D', 'B', 'A'])
+      expect(seq.map((t) => t.name)).to.eql(['C', 'D', 'B'])
     })
 
     it('Fails with cyclic dependencies', () => {
@@ -82,8 +81,8 @@ describe('Buggy CLI - Toolchain', function () {
         A: {name: 'A', consumes: '-', produces: 'data'},
         B: {name: 'B', consumes: 'data', produces: '--'}
       }
-      var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
-      expect(newSeq).to.eql(['A'])
+      var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
+      expect(newSeq.map((t) => t.name)).to.eql(['A'])
     })
 
     it('Can connect tools of different types', () => {
@@ -92,8 +91,8 @@ describe('Buggy CLI - Toolchain', function () {
         B: {name: 'B', consumes: 'inB', produces: '--'},
         transform: {name: 'transform', consumes: 'outA', produces: 'inB'}
       }
-      var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
-      expect(newSeq).to.eql(['A', 'transform'])
+      var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
+      expect(newSeq.map((t) => t.name)).to.eql(['A', 'transform'])
     })
 
     it('Throws an exception if it is not possible to connect the two processes', () => {
@@ -102,7 +101,7 @@ describe('Buggy CLI - Toolchain', function () {
         B: {name: 'B', consumes: 'inB', produces: '--'},
         transform: {name: 'transform', consumes: 'inA', produces: 'inB'}
       }
-      expect(() => ToolchainGen.connectTools(['A', 'B'], toolchain))
+      expect(() => ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain))
       .to.throw(Error)
     })
 
@@ -115,8 +114,8 @@ describe('Buggy CLI - Toolchain', function () {
         transform2: {name: 'transform2', consumes: 'outA', produces: 'inC'},
         transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'}
       }
-      var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
-      expect(newSeq).to.eql(['A', 'transform'])
+      var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
+      expect(newSeq.map((t) => t.name)).to.eql(['A', 'transform'])
     })
 
     it('Can handle longer connections', () => {
@@ -127,8 +126,8 @@ describe('Buggy CLI - Toolchain', function () {
         transform2: {name: 'transform2', consumes: 'outA', produces: 'inC'},
         transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'}
       }
-      var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
-      expect(newSeq).to.eql(['A', 'transform2', 'C', 'transform3'])
+      var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
+      expect(newSeq.map((t) => t.name)).to.eql(['A', 'transform2', 'C', 'transform3'])
     })
   })
 })

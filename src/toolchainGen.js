@@ -56,7 +56,7 @@ export function matchingInputTools (input, tools = Toolchain, provider) {
   return ToolAPI.inputs(tools, provider)
   .then((inputs) =>
     Promise.all(inputs.map((tool) => checkInputTool(tool, input, provider)))
-    .then((checks) => { debugger; return inputs.filter((_, n) => checks[n]) }))
+    .then((checks) => inputs.filter((_, n) => checks[n])))
   .then((tools) => {
     if (tools.length === 0) throw new Error('No input tools available for given input.')
     else return tools
