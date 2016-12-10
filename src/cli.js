@@ -17,11 +17,11 @@ prepareToolchain([Toolchain.lisgy, Toolchain.portgraph2kgraph, Toolchain.graphif
 .catch((err) => console.error(err))
 */
 
-var wasCommand = false
+global.wasCommand = false
 
 const command = (fn) => {
   return function (...args) {
-    wasCommand = true
+    global.wasCommand = true
     fn(...args)
   }
 }
@@ -35,7 +35,7 @@ var argv = yargs
   .argv
 
 // process input the 0-th argument will be the file name..?
-if (!wasCommand) {
+if (!global.wasCommand) {
   cliExt.input(argv._[0])
   .then((input) => {
     return run(input, argv.to, [], Toolchain, NPM)

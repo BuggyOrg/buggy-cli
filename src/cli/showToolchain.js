@@ -1,17 +1,30 @@
 
 import * as Toolchain from '../toolchain'
 import * as Format from '../format'
-import {toolchainSequence} from '../api'
+import {toolchainSequence, toolchainSequenceFromInput} from '../api'
 import * as NPM from '../npm/cacheCli'
+import {input} from 'cli-ext'
 
 export const command = 'show-toolchain'
 export const description = 'Show the toolchain to create a given output'
 export const builder = (yargs) => {
-  return yargs.demand(['from', 'to'])
+  return yargs.demand(['to'])
 }
 
 export const handler = (argv) => {
-  toolchainSequence(argv.from, argv.to, [], Toolchain, NPM)
+  global.wasCommand = true
+  var sequencePromise
+  if (argv.from) {
+    sequencePromise = toolchainSequence(argv.from, argv.to, [], Toolchain, NPM)
+  } else {
+    sequencePromise = input(argv._[1])
+    .then((contents) => toolchainSequenceFromInput(contents, argv.to, [], Toolchain, NPM))
+  }
+  sequencePromise
   .then((sequence) => Format.fancyToolchain(sequence))
   .then((sequence) => console.log(sequence))
+  .catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
 }
