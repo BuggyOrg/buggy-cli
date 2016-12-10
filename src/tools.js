@@ -10,6 +10,7 @@ import {exec} from 'child-process-promise'
 import fs from 'fs'
 import walk from 'walkdir'
 import semver from 'semver'
+import promiseSequence from 'promise-sequential'
 
 const systemAppDir = () =>
   process.env.APPDATA ||
@@ -203,9 +204,9 @@ export const satisfies = (tool, version, provider) => {
 }
 
 export function inputs (toolchain, provider) {
-  return Promise.all(
+  return promiseSequence(
     Object.keys(toolchain).map((k) => toolchain[k]).filter((tool) => tool.consumes.includes('input'))
-    .map((tool) => latestVersion(tool, provider)
+    .map((tool) => () => latestVersion(tool, provider)
       .then((latest) => extend(tool, {version: latest}))
       .then((tool) => install(tool, provider).then(() => tool))))
 }

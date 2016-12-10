@@ -4,6 +4,7 @@ import flatten from 'lodash/fp/flatten'
 import uniq from 'lodash/fp/uniq'
 import {calculateToolchain, calculateToolchainFromInput} from './toolchainGen'
 import {compare} from 'semver'
+import promiseSequence from 'promise-sequential'
 
 export function allValidVersions (sequence, provider) {
   return Promise.all(sequence.map((tool) => ToolAPI.validToolVersions(tool, provider)))
@@ -42,7 +43,7 @@ export function pinpointSequenceVersions (sequence, provider) {
 export function prepareToolchain (sequence, provider) {
   return pinpointSequenceVersions(sequence, provider)
   .then((version) => Promise.all(sequence.map((tool) => firstValid(tool, version, provider))))
-  .then((toolchain) => Promise.all(toolchain.map((tool) => ToolAPI.install(tool, provider)))
+  .then((toolchain) => promiseSequence(toolchain.map((tool) => () => ToolAPI.install(tool, provider)))
     .then(() => toolchain))
 }
 
