@@ -53,9 +53,10 @@ function checkInputTool (tool, input, provider) {
  * @returns {Array<Tools>} An array of tools that are valid input processors for the given input.
  */
 export function matchingInputTools (input, tools = Toolchain, provider) {
-  var inputs = ToolAPI.inputs(tools)
-  return Promise.all(inputs.map((tool) => checkInputTool(tool, input, provider)))
-  .then((checks) => inputs.filter((_, n) => checks[n]))
+  return ToolAPI.inputs(tools, provider)
+  .then((inputs) =>
+    Promise.all(inputs.map((tool) => checkInputTool(tool, input, provider)))
+    .then((checks) => { debugger; return inputs.filter((_, n) => checks[n]) }))
   .then((tools) => {
     if (tools.length === 0) throw new Error('No input tools available for given input.')
     else return tools

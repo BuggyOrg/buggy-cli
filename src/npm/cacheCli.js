@@ -3,7 +3,6 @@
  * query the npm-respository. It stores the results locally to increase speed.
  */
 
-
 import * as cli from './cliCommands'
 import cache from 'cache-function'
 import {cachePath} from '../tools'
@@ -18,7 +17,7 @@ import {cachePath} from '../tools'
  */
 export const install = cli.install
 
-export const cliInterface = cache(cli.cliInterface, {tmpDir: cachePath()})
+export const cliInterface = cache(cli.cliInterface, {tmpDir: cachePath(), useFileCache: true})
 
 /**
  * Get the version of a dependency for a specific package. Returns null if it
@@ -29,11 +28,11 @@ export const cliInterface = cache(cli.cliInterface, {tmpDir: cachePath()})
  * @returns {String} A Semver string specifying the version of the dependency. If
  * the package does not depend on the dependency it will return null.
  */
-export const dependencyVersion = cache(cli.dependencyVersion, {tmpDir: cachePath()})
+export const dependencyVersion = cache(cli.dependencyVersion, {tmpDir: cachePath(), useFileCache: true})
 
 /**
  * Gets a list of versions for a package.
  * @param {String} pkg The package.
  * @returns {Array} An array of version strings (in Semver format).
  */
-export const packageVersions = cache(cli.packageVersions, {tmpDir: cachePath()})
+export const packageVersions = cache(cli.packageVersions, {tmpDir: cachePath(), useFileCache: true})

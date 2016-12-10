@@ -127,6 +127,10 @@ export const toolAPI = (dependency) => {
 export const gatherVersions = (pkg, provider) =>
   provider.packageVersions(pkg)
 
+export const latestVersion = (pkg, provider) =>
+  gatherVersions(pkg, provider)
+  .then((versions) => versions.sort((a, b) => semver.compare(b, a))[0])
+
 
 /**
  * Get the graphtool dependency for a specific package. Returns null if it
@@ -199,6 +203,10 @@ export const satisfies = (tool, version, provider) => {
   }
 }
 
-export function inputs (toolchain) {
-  return Object.keys(toolchain).map((k) => toolchain[k]).filter((tool) => tool.consumes.includes('input'))
+export function inputs (toolchain, provider) {
+  return Promise.all(
+    Object.keys(toolchain).map((k) => toolchain[k]).filter((tool) => tool.consumes.includes('input'))
+    .map((tool) => latestVersion(tool, provider)
+      .then((latest) => extend(tool, {version: latest}))
+      .then((tool) => install(tool, provider).then(() => tool))))
 }

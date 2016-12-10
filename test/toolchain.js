@@ -13,9 +13,10 @@ var expect = chai.expect
 describe('Buggy CLI - Toolchain', function () {
   describe('Inputs', () => {
     it('Input tools are called with the input for activation', () => {
-      const spy = sinon.spy()
+      const spy = sinon.stub().returns(true)
+      const provider = {packageVersions: () => Promise.resolve(['0.1.0']), install: () => Promise.resolve()}
       const toolchain = {tool1: {activatedBy: spy, consumes: ['input']}}
-      return ToolchainGen.matchingInputTools('test', toolchain)
+      return ToolchainGen.matchingInputTools('test', toolchain, provider)
       .then(() => {
         expect(spy).to.be.calledWith('test')
       })
@@ -23,8 +24,9 @@ describe('Buggy CLI - Toolchain', function () {
 
     it('Selects input tools by activation value', () => {
       const spy = sinon.stub().returns(true)
+      const provider = {packageVersions: () => Promise.resolve(['0.1.0']), install: () => Promise.resolve()}
       const toolchain = {tool1: {name: 'tool1', activatedBy: spy, consumes: ['input']}}
-      return ToolchainGen.matchingInputTools('test', toolchain)
+      return ToolchainGen.matchingInputTools('test', toolchain, provider)
       .then((matching) => expect(matching[0].name).to.equal('tool1'))
     })
 
@@ -33,7 +35,8 @@ describe('Buggy CLI - Toolchain', function () {
         tool1: {name: 'tool1', activatedBy: 'grep', consumes: ['input'], noNode: true},
         tool2: {name: 'tool2', activatedBy: 'echo $<input>', consumes: ['input'], noNode: true}
       }
-      return ToolchainGen.matchingInputTools('test', toolchain, {cliInterface: () => Promise.resolve('')})
+      const provider = {packageVersions: () => Promise.resolve(['0.1.0']), install: () => Promise.resolve(), cliInterface: () => Promise.resolve('')}
+      return ToolchainGen.matchingInputTools('test', toolchain, provider)
       .then((matching) => expect(matching).to.have.length(1))
     })
   })
@@ -80,7 +83,7 @@ describe('Buggy CLI - Toolchain', function () {
         B: {name: 'B', consumes: 'data', produces: '--'}
       }
       var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
-      expect(newSeq).to.eql(['A', 'B'])
+      expect(newSeq).to.eql(['A'])
     })
 
     it('Can connect tools of different types', () => {
@@ -90,7 +93,7 @@ describe('Buggy CLI - Toolchain', function () {
         transform: {name: 'transform', consumes: 'outA', produces: 'inB'}
       }
       var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
-      expect(newSeq).to.eql(['A', 'transform', 'B'])
+      expect(newSeq).to.eql(['A', 'transform'])
     })
 
     it('Throws an exception if it is not possible to connect the two processes', () => {
@@ -113,7 +116,7 @@ describe('Buggy CLI - Toolchain', function () {
         transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'}
       }
       var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
-      expect(newSeq).to.eql(['A', 'transform', 'B'])
+      expect(newSeq).to.eql(['A', 'transform'])
     })
 
     it('Can handle longer connections', () => {
@@ -125,7 +128,7 @@ describe('Buggy CLI - Toolchain', function () {
         transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'}
       }
       var newSeq = ToolchainGen.connectTools(['A', 'B'], toolchain)
-      expect(newSeq).to.eql(['A', 'transform2', 'C', 'transform3', 'B'])
+      expect(newSeq).to.eql(['A', 'transform2', 'C', 'transform3'])
     })
   })
 })

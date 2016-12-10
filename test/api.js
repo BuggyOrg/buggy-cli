@@ -71,7 +71,7 @@ describe('Buggy API', () => {
     })
   })
 
-  describe.only('Toolchain generation', () => {
+  describe('Toolchain generation', () => {
     it('Creates a toolchain for an input and output', () => {
       const toolchain = {
         A: {name: 'A', consumes: 'input', produces: 'go', activatedBy: () => true}

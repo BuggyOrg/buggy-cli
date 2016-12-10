@@ -2,7 +2,7 @@
 /* global __dirname, process */
 
 import * as Toolchain from './toolchain'
-import * as NPM from './npm/cliCommands'
+import * as NPM from './npm/cacheCli'
 import {run} from './api'
 import * as ToolAPI from './tools'
 import * as Format from './format'
@@ -30,7 +30,7 @@ var argv = yargs
   .alias('f', 'from')
   .alias('t', 'to')
   .demand('t')
-  .command('list-inputs', 'List all available input types', command(() => console.log(Format.tools(ToolAPI.inputs(Toolchain)))))
+  .command('list-inputs', 'List all available input types', command(() => console.log(Format.tools(ToolAPI.inputs(Toolchain, NPM)))))
   .commandDir('cli')
   .argv
 
