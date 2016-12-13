@@ -3,20 +3,14 @@
 
 import * as Toolchain from './toolchain'
 import * as NPM from './npm/cacheCli'
+import * as NPMUpdate from './npm/updateCacheCli'
 import {run} from './api'
 import * as ToolAPI from './tools'
 import * as Format from './format'
 import yargs from 'yargs'
-import chalk from 'chalk'
 import cliExt from 'cli-ext'
 
-/*
-prepareToolchain([Toolchain.lisgy, Toolchain.portgraph2kgraph, Toolchain.graphify], npm)
-.then((res) => fancyToolchain(res))
-.then((res) => console.log(res))
-.catch((err) => console.error(err))
-*/
-
+// communicate with the other cli commands via a global variable.
 global.wasCommand = false
 
 const command = (fn) => {
@@ -26,22 +20,36 @@ const command = (fn) => {
   }
 }
 
+var libraryURI = process.env.BUGGY_LIBRARY_HOST || 'http://localhost:8088'
+
 var argv = yargs
   .alias('f', 'from')
+  .describe('f', 'The source format.')
   .alias('t', 'to')
+  .describe('t', 'The target format.')
+  .alias('u', 'updateCache')
+  .describe('u', 'Update the cache (do not use cached values).')
+  .alias('l', 'library')
+  .describe('l', 'Library URI for the component library. Defaults to BUGGY_LIBRARY_HOST or "http://localhost:8088".')
+  .default('l', libraryURI)
+  .global(['updateCache', 'from', 'to', 'library'])
   .demand('t')
   .command('list-inputs', 'List all available input types', command(() => console.log(Format.tools(ToolAPI.inputs(Toolchain, NPM)))))
   .commandDir('cli')
+  .help()
   .argv
 
-// process input the 0-th argument will be the file name..?
 if (!global.wasCommand) {
   cliExt.input(argv._[0])
   .then((input) => {
-    return run(input, argv.to, [], Toolchain, NPM)
+    var provider = NPM
+    if (argv.updateCache) {
+      provider = NPMUpdate
+    }
+    return run(input, argv.to, [], Toolchain, provider)
   })
   .then((output) => {
     console.log(output)
   })
-  .catch((err) => {console.error(err)})
+  .catch((err) => { console.error(err) })
 }

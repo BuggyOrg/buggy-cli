@@ -124,8 +124,9 @@ export const toolAPI = (dependency) => {
  *   This could be a npm-provider that looks into the npm-registry.
  * @returns {Promise<String[]>} An array of version strings (in Semver format).
  */
-export const gatherVersions = (pkg, provider) =>
-  provider.packageVersions(pkg.module)
+export const gatherVersions = (pkg, provider) => {
+  return provider.packageVersions(pkg.module)
+}
 
 export const latestVersion = (pkg, provider) =>
   gatherVersions(pkg, provider)

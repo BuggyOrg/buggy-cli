@@ -17,7 +17,7 @@ import {cachePath} from '../tools'
  */
 export const install = cli.install
 
-export const cliInterface = cache(cli.cliInterface, {tmpDir: cachePath(), useFileCache: true, tmpPrefix: 'cache/cliInterface'})
+export const cliInterface = cache(cli.cliInterface, {tmpDir: cachePath(), useFileCache: true, tmpPrefix: 'cache/cliInterface', updateCache: true})
 
 /**
  * Get the version of a dependency for a specific package. Returns null if it
@@ -28,11 +28,11 @@ export const cliInterface = cache(cli.cliInterface, {tmpDir: cachePath(), useFil
  * @returns {String} A Semver string specifying the version of the dependency. If
  * the package does not depend on the dependency it will return null.
  */
-export const dependencyVersion = cache(cli.dependencyVersion, {tmpDir: cachePath(), useFileCache: true, tmpPrefix: 'cache/dependencyVersion'})
+export const dependencyVersion = cache(cli.dependencyVersion, {tmpDir: cachePath(), useFileCache: true, tmpPrefix: 'cache/dependencyVersion', updateCache: true})
 
 /**
  * Gets a list of versions for a package.
  * @param {String} pkg The package.
  * @returns {Array} An array of version strings (in Semver format).
  */
-export const packageVersions = cache(cli.packageVersions, {tmpDir: cachePath(), useFileCache: true, tmpPrefix: 'cache/packageVersions'})
+export const packageVersions = cache(cli.packageVersions, {tmpDir: cachePath(), useFileCache: true, tmpPrefix: 'cache/packageVersions', updateCache: true})

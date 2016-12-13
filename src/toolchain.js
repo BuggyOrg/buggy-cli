@@ -5,11 +5,11 @@
 export const lisgy = {
   name: 'lisgy',
   module: '@buggyorg/lisgy',
-  minVersion: '0.2.0-pre.0',
+  minVersion: '0.2.0-pre.1',
   consumes: 'input',
   produces: 'portgraph',
-  activatedBy: ['$<bin> $<args>'],
-  args: 'pc'
+  activatedBy: ['$<bin> input'],
+  args: 'input'
 }
 
 export const json = {

@@ -30,10 +30,11 @@
     "standard": "^6.0.8"
   },
   "dependencies": {
-    "cache-function": "^1.0.1",
+    "@buggyorg/library-cli": "^0.1.2",
     "chalk": "^1.1.3",
     "child-process-promise": "^2.2.0",
     "cli-ext": "^1.0.0",
+    "function-cache": "LittleHelicase/function-cache#8e95eeb1f204c24f43470abb848adbc9d3852cc5",
     "get-stdin": "^5.0.1",
     "graphlib": "^2.1.1",
     "lodash": "^4.17.2",

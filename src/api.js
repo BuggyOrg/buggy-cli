@@ -19,6 +19,10 @@ export function allValidVersions (sequence, provider) {
 function firstValid (tool, basicVersion, provider) {
   return ToolAPI.validToolVersions(tool, provider)
   .then((tools) => tools.reverse().find((tool) => ToolAPI.satisfies(tool, basicVersion, provider)))
+  .then((valid) => {
+    if (!valid) throw new Error('Could not find a valid version for tool ' + tool.module)
+    else return valid
+  })
 }
 
 function checkVersion (sequence, version, provider) {
