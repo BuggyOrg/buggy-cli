@@ -24,6 +24,13 @@ export const json = {
   }]
 }
 
+export const component = {
+  name: 'component',
+  consumes: 'portgraph',
+  produces: 'component',
+  command: (portgraph) => JSON.parse(portgraph).components[0]
+}
+
 export const portgraph2kgraph = {
   name: 'portgraph2kgraph',
   module: '@buggyorg/portgraph2kgraph',

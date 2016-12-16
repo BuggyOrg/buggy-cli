@@ -60,7 +60,8 @@ export const install = (tool, provider) => {
   .then((isNPM) => {
     if (isNPM) {
       var depPath = dependencyPath(tool.module, tool.version)
-      if (fs.existsSync(depPath)) return Promise.resolve()
+      var pjson = join(depPath, 'package.json')
+      if (fs.existsSync(depPath) && fs.existsSync(pjson)) return Promise.resolve()
       return provider.install(tool.module, tool.version, depPath)
     } else {
       return Promise.resolve()
@@ -73,6 +74,9 @@ export const execute = (tool, input, provider) => {
 }
 
 export const run = (tool, input, execString, provider) => {
+  if (tool.command) {
+    return Promise.resolve(tool.command(input))
+  }
   return provider.cliInterface(tool.module, tool.version, dependencyPath(tool.module, tool.version))
   .then((bin) => {
     var args = []
@@ -126,6 +130,7 @@ export const toolAPI = (dependency) => {
  */
 export const gatherVersions = (pkg, provider) => {
   return provider.packageVersions(pkg.module)
+  .catch(() => [])
 }
 
 export const latestVersion = (pkg, provider) => {
@@ -201,14 +206,14 @@ export const satisfies = (tool, version, provider) => {
   } else {
     return graphtoolDependency(tool.module, tool.version, provider)
     .then((gtVersion) =>
-      Promise.resolve(atLeastSemver(gtVersion, version)))
+      (gtVersion) ? Promise.resolve(atLeastSemver(gtVersion, version)) : Promise.resolve(true))
   }
 }
 
 export function inputs (toolchain, provider) {
   return promiseSequence(
     Object.keys(toolchain).map((k) => toolchain[k]).filter((tool) => tool.consumes.includes('input'))
-    .map((tool) => () => latestVersion(tool, provider)
+    .map((tool) => () => (!tool.module) ? tool : latestVersion(tool, provider)
       .then((latest) => extend(tool, {version: latest}))
-      .then((tool) => install(tool, provider))))
+      .then((tool) => install(tool, provider).then(() => tool))))
 }

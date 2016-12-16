@@ -17,6 +17,7 @@ export function allValidVersions (sequence, provider) {
 }
 
 function firstValid (tool, basicVersion, provider) {
+  if (tool.command) return Promise.resolve(tool)
   return ToolAPI.validToolVersions(tool, provider)
   .then((tools) => tools.reverse().find((tool) => ToolAPI.satisfies(tool, basicVersion, provider)))
   .then((valid) => {

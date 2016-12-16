@@ -1,6 +1,6 @@
 
 import library from '@buggyorg/library-cli/lib/commands/commands'
-import {toolchainSequenceFromInput, graphToInputFormat} from '../api'
+import {run, graphToInputFormat} from '../api'
 import * as Toolchain from '../toolchain'
 import * as NPM from '../npm/cacheCli'
 
@@ -13,7 +13,7 @@ export const builder = (yargs) => {
   var provider = NPM
   return library(yargs,
     // conversion [input] -> [portgraph] (e.g. lisgy input to portgraph)
-    (contents) => toolchainSequenceFromInput(contents, 'portgraph', [], Toolchain, provider),
+    (contents) => run(contents, 'component', [], Toolchain, provider),
     // TODO: conversion [portgraph] -> [input] (e.g. portgraph to lisgy)
     (graph) => graphToInputFormat(graph, Toolchain, provider))
 }
