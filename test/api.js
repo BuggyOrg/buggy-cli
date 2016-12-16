@@ -88,7 +88,7 @@ describe('Buggy API', () => {
         D: {name: 'D', consumes: 'json', produces: 'json', depends: ['C']},
         E: {name: 'E', consumes: 'json', produces: 'out'},
         F: {name: 'F', consumes: 'json', produces: '-1-'},
-        G: {name: 'G', consumes: '-1-', produces: 'out'},
+        G: {name: 'G', consumes: '-1-', produces: 'out'}
       }
       return API.createSequence(toolchain['A'], 'out', ['D'], toolchain, {cliInterface: () => 'echo a'})
       .then((sequence) => 
@@ -105,6 +105,21 @@ describe('Buggy API', () => {
       }
       return expect(API.createSequence('A', 'out', ['D'], toolchain, {cliInterface: () => 'echo a'}))
       .to.be.rejected
+    })
+  })
+
+  describe.only('Conversion tools', () => {
+    it('Gets the input string for the graph', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: 'input', produces: 'json', activatedBy: () => true},
+        B: {name: 'B', consumes: 'input', produces: 'json', activatedBy: () => false}
+      }
+      expect(API.graphToInputFormat({metaInformation: {A: '<test>'}}, toolchain,
+        {
+          packageVersions: () => Promise.resolve(['0.1.0']),
+          dependencyVersion: (p, v) => Promise.resolve(v)
+        }))
+      .to.eventually.equal('<test>')
     })
   })
 })

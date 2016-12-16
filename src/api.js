@@ -83,6 +83,7 @@ export function toolchainSequence (input, output, args, tools, provider) {
 }
 
 export function toolchainSequenceFromInput (input, output, args, tools, provider) {
+  console.log('from input', input)
   return createSequenceFromInput(input, output, args, tools, provider)
   .then((sequence) => prepareToolchain(sequence, provider))
 }
@@ -90,4 +91,14 @@ export function toolchainSequenceFromInput (input, output, args, tools, provider
 export function run (input, output, args, tools, provider) {
   return toolchainSequenceFromInput(input, output, args, tools, provider)
   .then((sequence) => runToolChain(sequence, input, provider))
+}
+
+export function graphToInputFormat (graph, tools, provider) {
+  return ToolAPI.inputs(tools, provider)
+  .then((inputs) => {
+    var validTool = inputs.filter((input) =>
+      typeof (graph.metaInformation[input.name]) === 'string')[0]
+    if (validTool) return graph.metaInformation[validTool.name]
+    else return graph
+  })
 }

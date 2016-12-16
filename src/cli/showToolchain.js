@@ -16,10 +16,8 @@ export const builder = (yargs) => {
 export const handler = (argv) => {
   global.wasCommand = true
   var provider = NPM
-  console.log('update cache', argv.updateCache, argv.u)
   if (argv.updateCache) {
     provider = NPMUpdate
-    console.log('update cache')
   }
   var sequencePromise
   if (argv.from) {

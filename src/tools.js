@@ -128,9 +128,12 @@ export const gatherVersions = (pkg, provider) => {
   return provider.packageVersions(pkg.module)
 }
 
-export const latestVersion = (pkg, provider) =>
-  gatherVersions(pkg, provider)
+export const latestVersion = (pkg, provider) => {
+  console.log('latest', pkg)
+  return gatherVersions(pkg, provider)
+  .then((latest) => { console.log('latest', latest); return latest })
   .then((versions) => versions.sort((a, b) => semver.compare(b, a))[0])
+}
 
 
 /**
@@ -205,9 +208,13 @@ export const satisfies = (tool, version, provider) => {
 }
 
 export function inputs (toolchain, provider) {
+  console.log('sequence?', Object.keys(toolchain).map((k) => toolchain[k]).filter((tool) => tool.consumes.includes('input'))
+    .map((tool) => () => latestVersion(tool, provider)
+      .then((latest) => extend(tool, {version: latest}))
+      .then((tool) => install(tool, provider).then(() => { console.log('tool is toll'); return tool })))[0]())
   return promiseSequence(
     Object.keys(toolchain).map((k) => toolchain[k]).filter((tool) => tool.consumes.includes('input'))
     .map((tool) => () => latestVersion(tool, provider)
       .then((latest) => extend(tool, {version: latest}))
-      .then((tool) => install(tool, provider).then(() => tool))))
+      .then((tool) => install(tool, provider).then(() => { console.log('tool is toll'); return tool }))))
 }

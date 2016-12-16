@@ -35,4 +35,5 @@ export const dependencyVersion = cache(cli.dependencyVersion, {tmpDir: cachePath
  * @param {String} pkg The package.
  * @returns {Array} An array of version strings (in Semver format).
  */
-export const packageVersions = cache(cli.packageVersions, {tmpDir: cachePath(), useFileCache: true, tmpPrefix: 'cache/packageVersions'})
+export const packageVersions = (pkg) =>
+  cache(cli.packageVersions, {tmpDir: cachePath(), useFileCache: true, tmpPrefix: 'cache/packageVersions'})(pkg)

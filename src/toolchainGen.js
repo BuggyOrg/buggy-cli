@@ -25,6 +25,7 @@ function checkActivation (tool, input, provider) {
   return (activation) => {
     if (typeof (activation) === 'function') return Promise.resolve(activation(input))
     else {
+      console.log('checking ', tool.name, activation)
       return ToolAPI.run(tool, input, activation, provider)
       .then(() => true)
       .catch(() => false)
@@ -38,6 +39,7 @@ function checkInputToolArray (tool, activations, input, provider) {
 }
 
 function checkInputTool (tool, input, provider) {
+  console.log('checking ', tool.name)
   if (!tool.activatedBy) return false // each input must be activated
   if (!Array.isArray(tool.activatedBy)) {
     return checkInputToolArray(tool, [tool.activatedBy], input, provider)
@@ -53,7 +55,8 @@ function checkInputTool (tool, input, provider) {
  * @returns {Array<Tools>} An array of tools that are valid input processors for the given input.
  */
 export function matchingInputTools (input, tools = Toolchain, provider) {
-  return ToolAPI.inputs(tools, provider)
+  console.log('matching input tools')
+  return ToolAPI.inputs(tools, provider).then((i) => { console.log('input: ', i); return i })
   .then((inputs) =>
     Promise.all(inputs.map((tool) => checkInputTool(tool, input, provider)))
     .then((checks) => inputs.filter((_, n) => checks[n])))
