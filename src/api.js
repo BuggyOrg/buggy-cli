@@ -83,7 +83,6 @@ export function toolchainSequence (input, output, args, tools, provider) {
 }
 
 export function toolchainSequenceFromInput (input, output, args, tools, provider) {
-  console.log('from input', input)
   return createSequenceFromInput(input, output, args, tools, provider)
   .then((sequence) => prepareToolchain(sequence, provider))
 }
