@@ -21,7 +21,8 @@ export const json = {
       JSON.parse(input)
       return true
     } catch (err) { return false }
-  }]
+  }],
+  command: (input) => input
 }
 
 export const component = {
