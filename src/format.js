@@ -2,22 +2,22 @@
  * formats the output
  */
 
-import {exec} from 'child-process-promise'
+import {render} from 'terminal-graphs'
+
+const betweenPairs = (callback, sequence) => {
+  return sequence.reduce((acc, cur) => {
+    if (acc[0] == null) return [cur, acc[1]]
+    else {
+      var prev = acc[0]
+      return [cur, acc[1].concat(callback(prev, cur))]
+    }
+  }, [null, []])[1]
+}
 
 export const fancyToolchain = (toolchain) => {
-  return exec('which graph-easy')
-  .then(() => {
-    var easyGraphTxt = toolchain.map((tool) => '[' + tool.module + '\\n@' + tool.version + ']')
-      .join(' --> ')
-    var easyGraphProc = exec('graph-easy --from=txt --as=boxart')
-    easyGraphProc.childProcess.stdin.write(easyGraphTxt)
-    easyGraphProc.childProcess.stdin.end()
-    return easyGraphProc
-  })
-  .then((result) => result.stdout.trim())
-  .catch(() => {
-    normalToolchain(toolchain)
-  })
+  var children = toolchain.map((tool) => ({id: tool.module, labels: [{text: tool.module + '\n' + tool.version}]}))
+  var edges = betweenPairs((a, b) => ({id: a.module + b.module, source: a.module, target: b.module}), toolchain)
+  return render({children, edges, labels: [{text: ''}]})
 }
 
 export const normalToolchain = (toolchain) => 'Install `graph-easy` to view the high quality output\n\n' + (toolchain)
