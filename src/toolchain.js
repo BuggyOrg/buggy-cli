@@ -55,8 +55,8 @@ export const resolve = {
   name: 'resolve',
   module: '@buggyorg/resolve',
   minVersion: '0.2.2',
-  consumes: ['portgraph'],
-  produces: ['portgraph'],
+  consumes: 'portgraph',
+  produces: 'portgraph',
   activatedBy: ['resolve']
 }
 
