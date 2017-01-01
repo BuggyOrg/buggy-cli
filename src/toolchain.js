@@ -29,13 +29,18 @@ export const component = {
   name: 'component',
   consumes: 'portgraph',
   produces: 'component',
-  command: (portgraph) => JSON.parse(portgraph).components[0]
+  command: (portgraph) => {
+    if (portgraph.componentId) return portgraph
+    if (JSON.parse(portgraph).componentId) return JSON.parse(portgraph)
+    return JSON.parse(portgraph).components[0]
+  }
 }
 
 export const portgraph2kgraph = {
   name: 'portgraph2kgraph',
   module: '@buggyorg/portgraph2kgraph',
   consumes: 'portgraph',
+  depends: ['resolve'],
   produces: 'kgraph'
 }
 
@@ -47,7 +52,9 @@ export const graphify = {
 }
 
 export const resolve = {
+  name: 'resolve',
   module: '@buggyorg/resolve',
+  minVersion: '0.2.2',
   consumes: ['portgraph'],
   produces: ['portgraph'],
   activatedBy: ['resolve']

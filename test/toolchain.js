@@ -42,27 +42,32 @@ describe('Buggy CLI - Toolchain', function () {
   })
 
   describe('Dependencies', () => {
-    it('Can work with no dependencies', () => {
-      var seq = ToolchainGen.outputDependencies({depends: [], name: 'A'}, {}, {})
-      expect(seq).to.have.length(0)
+    it('Deals with dependencies for in-between tools', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: '-', produces: 'outA'},
+        B: {name: 'B', consumes: 'inB', produces: '--'},
+        C: {name: 'C', consumes: 'inC', produces: 'outC', depends: ['depC']},
+        transform2: {name: 'transform2', consumes: 'outA', produces: 'inC'},
+        transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'},
+        depC: {name: 'depC', consumes: 'inC', produces: 'inC', activatedBy: 'depC'}
+      }
+      var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
+      var depSeq = ToolchainGen.sequenceDependencies(newSeq, toolchain)
+      expect(depSeq.map((t) => t.name)).to.eql(['A', 'transform2', 'depC', 'C', 'transform3', 'B'])
     })
 
-    it('Finds a single dependency', () => {
+    it('Only inserts dependencies once', () => {
       const toolchain = {
-        B: {name: 'B', depends: []}
+        A: {name: 'A', consumes: '-', produces: 'outA'},
+        B: {name: 'B', consumes: 'inB', produces: '--', depends: ['depC']},
+        C: {name: 'C', consumes: 'inC', produces: 'outC', depends: ['depC']},
+        transform2: {name: 'transform2', consumes: 'outA', produces: 'inC'},
+        transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'},
+        depC: {name: 'depC', consumes: 'inC', produces: 'inC', activatedBy: 'depC'}
       }
-      var seq = ToolchainGen.outputDependencies({depends: ['B'], name: 'A'}, toolchain, {})
-      expect(seq).to.have.length(1)
-      expect(seq.map((t) => t.name)).to.eql(['B'])
-    })
-
-    it('Handles complex dependencies', () => {
-      const toolchain = {
-        B: {name: 'B', depends: ['D']}, C: {name: 'C', depends: []},
-        D: {name: 'D', depends: ['C']}, E: {name: 'E', depends: ['B', 'C']}
-      }
-      var seq = ToolchainGen.outputDependencies({depends: ['B', 'C'], name: 'A'}, toolchain, {})
-      expect(seq.map((t) => t.name)).to.eql(['C', 'D', 'B'])
+      var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
+      var depSeq = ToolchainGen.sequenceDependencies(newSeq, toolchain)
+      expect(depSeq.map((t) => t.name)).to.eql(['A', 'transform2', 'depC', 'C', 'transform3', 'B'])
     })
 
     it('Fails with cyclic dependencies', () => {
@@ -82,7 +87,7 @@ describe('Buggy CLI - Toolchain', function () {
         B: {name: 'B', consumes: 'data', produces: '--'}
       }
       var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
-      expect(newSeq.map((t) => t.name)).to.eql(['A'])
+      expect(newSeq.map((t) => t.name)).to.eql(['A', 'B'])
     })
 
     it('Can connect tools of different types', () => {
@@ -92,7 +97,7 @@ describe('Buggy CLI - Toolchain', function () {
         transform: {name: 'transform', consumes: 'outA', produces: 'inB'}
       }
       var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
-      expect(newSeq.map((t) => t.name)).to.eql(['A', 'transform'])
+      expect(newSeq.map((t) => t.name)).to.eql(['A', 'transform', 'B'])
     })
 
     it('Throws an exception if it is not possible to connect the two processes', () => {
@@ -115,7 +120,7 @@ describe('Buggy CLI - Toolchain', function () {
         transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'}
       }
       var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
-      expect(newSeq.map((t) => t.name)).to.eql(['A', 'transform'])
+      expect(newSeq.map((t) => t.name)).to.eql(['A', 'transform', 'B'])
     })
 
     it('Can handle longer connections', () => {
@@ -127,7 +132,7 @@ describe('Buggy CLI - Toolchain', function () {
         transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'}
       }
       var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
-      expect(newSeq.map((t) => t.name)).to.eql(['A', 'transform2', 'C', 'transform3'])
+      expect(newSeq.map((t) => t.name)).to.eql(['A', 'transform2', 'C', 'transform3', 'B'])
     })
   })
 })

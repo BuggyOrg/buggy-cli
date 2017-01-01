@@ -18,6 +18,8 @@ import * as ToolAPI from './tools'
 import { Graph, alg } from 'graphlib'
 import flatten from 'lodash/fp/flatten'
 import merge from 'lodash/fp/merge'
+import uniq from 'lodash/fp/uniq'
+import contains from 'lodash/fp/contains'
 
 // function
 
@@ -80,12 +82,34 @@ function checkCycles (graph) {
   }
 }
 
-export function outputDependencies (output, tools = Toolchain, provider) {
+export function outputDependencies (outputs, tools = Toolchain, provider) {
+  if (!Array.isArray(outputs)) return sequenceDependencies([outputs], tools, provider)
+}
+
+export function sequenceDependencies (sequence, tools = Toolchain, provider) {
   var graph = new Graph({ directed: true })
-  graph.setNode(output.name, output)
-  var depGraph = dependencyGraph(graph, [output], tools, provider)
+  sequence.forEach((tool) => graph.setNode(tool.name, tool))
+  // simplify this shit... every dependency must be in the graph,
+  // but it also must take the sequence into account. Therefore add a
+  // edge for each dependency and from the predecessor add an edge from the
+  // depdency to the predecessor. Except when the dependency is the predecessor...
+  betweenPairs((from, to) => graph.setEdge(to.name, from.name) &&
+    (to.depends || []).forEach((dep) => {
+      graph.setNode(dep, tools[dep])
+      graph.setEdge(to.name, dep)
+      if (from.name !== dep && from.produces === tools[dep].consumes && !contains(dep, from.depends)) {
+        graph.setEdge(dep, from.name)
+        // apply this for all the dependencies of the dependencies.. should probalby be recursive here...
+        ;(tools[dep].depends || []).forEach((d) => {
+          if (from.name !== d && from.produces === tools[d].consumes && !contains(d, from.depends)) {
+            graph.setEdge(d, from.name)
+          }
+        })
+      }
+    }), sequence)
+  var depGraph = dependencyGraph(graph, sequence, tools, provider)
   checkCycles(depGraph)
-  return alg.topsort(depGraph).reverse().slice(0, -1).map((t) => tools[t])
+  return alg.topsort(depGraph).reverse().map((t) => tools[t])
 }
 
 const betweenPairs = (callback, sequence) => {
@@ -114,7 +138,15 @@ function createToolchainGraph (tools) {
   return toolchain
 }
 
-export function toolSequence (from, to, toolGraph) {
+function adoptDependencies (dependencies, prev, tools) {
+  return (tool) => {
+    return merge(tool, {depends: uniq((tool.depends || [])
+      .concat(dependencies.filter((dep) => tools[dep].produces === tool.consumes))
+      .concat([prev.name]))})
+  }
+}
+
+export function toolSequence (from, to, toolGraph, tools) {
   const paths = alg.dijkstra(toolGraph, from.name)
   var path = []
   var cur = to.name
@@ -144,8 +176,10 @@ function toTools (tools) {
  */
 export function connectTools (sequence, tools, provider) {
   var graph = createToolchainGraph(tools)
-  var newTools = betweenPairs((prev, cur) => toolSequence(prev, cur, graph).map(toTools(tools)), sequence)
-  return newTools.slice(0, -1)
+  var newTools = betweenPairs((prev, cur) => toolSequence(prev, cur, graph, tools)
+    .map(toTools(tools))
+    .map(adoptDependencies(cur.depends || [], prev, tools)), sequence)
+  return newTools
 }
 
 export function calculateToolchainFromInput (input, output, tools, provider) {
@@ -155,6 +189,8 @@ export function calculateToolchainFromInput (input, output, tools, provider) {
 
 export function calculateToolchain (input, output, tools, provider) {
   return Promise.resolve(input)
-  .then((input) => [input].concat(outputDependencies(output, tools, provider)).concat([output]))
+  .then((input) => [input, output])
   .then((sequence) => connectTools(sequence, merge(tools, {output: output}), provider))
+  .then((sequence) => sequenceDependencies(sequence, tools, provider))
+  .then((sequence) => sequence.slice(0, -1))
 }

@@ -91,7 +91,7 @@ describe('Buggy API', () => {
         G: {name: 'G', consumes: '-1-', produces: 'out'}
       }
       return API.createSequence(toolchain['A'], 'out', ['D'], toolchain, {cliInterface: () => 'echo a'})
-      .then((sequence) => 
+      .then((sequence) =>
         expect(sequence.map((tool) => tool.name)).to.eql(['A', 'C', 'D', 'E']))
     })
 
@@ -108,7 +108,7 @@ describe('Buggy API', () => {
     })
   })
 
-  describe.only('Conversion tools', () => {
+  describe('Conversion tools', () => {
     it('Gets the input string for the graph', () => {
       const toolchain = {
         A: {name: 'A', consumes: 'input', produces: 'json', activatedBy: () => true},
