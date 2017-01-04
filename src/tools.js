@@ -173,7 +173,7 @@ const atLeastSemver = (version, least) =>
  * @returns {boolean} True if the version is at least 0.4.0-pre.7, false otherwise.
  */
 export const validGraphtoolsVersion = (version) =>
-  atLeastSemver(version, '0.4.0-pre.7') // we currently want to match 0.4.0-pre.7 too
+  atLeastSemver(version, '0.4.0-pre.11') // we currently want to match 0.4.0-pre.7 too
 
 /**
  * A tool is valid if it has no graphtools dependency, or if the graphtools

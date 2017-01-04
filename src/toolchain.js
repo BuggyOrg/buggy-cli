@@ -8,8 +8,8 @@ export const lisgy = {
   minVersion: '0.2.0-pre.1',
   consumes: 'input',
   produces: 'portgraph',
-  activatedBy: ['$<bin> input'],
-  args: 'input'
+  activatedBy: ['$<bin>'],
+  args: ''
 }
 
 export const json = {

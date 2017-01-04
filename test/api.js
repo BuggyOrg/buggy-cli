@@ -101,7 +101,7 @@ describe('Buggy API', () => {
         B: {name: 'B', consumes: 'input', produces: 'json', activatedBy: () => false},
         C: {name: 'C', consumes: 'json', produces: 'json'},
         D: {name: 'D', consumes: 'json', produces: 'json', depends: ['C']},
-        F: {name: 'F', consumes: 'json', produces: '-1-'},
+        F: {name: 'F', consumes: 'json', produces: '-1-'}
       }
       return expect(API.createSequence('A', 'out', ['D'], toolchain, {cliInterface: () => 'echo a'}))
       .to.be.rejected
