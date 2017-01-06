@@ -51,6 +51,14 @@ export const graphify = {
   produces: 'svg'
 }
 
+export const html = {
+  name: 'html',
+  module: '@buggyorg/graphify',
+  consumes: 'kgraph',
+  args: '-p',
+  produces: 'html'
+}
+
 export const resolve = {
   name: 'resolve',
   module: '@buggyorg/resolve',
