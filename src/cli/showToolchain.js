@@ -21,10 +21,10 @@ export const handler = (argv) => {
   }
   var sequencePromise
   if (argv.from) {
-    sequencePromise = toolchainSequence(argv.from, argv.to, [], Toolchain, provider)
+    sequencePromise = toolchainSequence(argv.from, argv.to, argv.require || [], Toolchain, provider)
   } else {
     sequencePromise = input(argv._[1])
-    .then((contents) => toolchainSequenceFromInput(contents, argv.to, [], Toolchain, provider))
+    .then((contents) => toolchainSequenceFromInput(contents, argv.to, argv.require || [], Toolchain, provider))
   }
   sequencePromise
   .then((sequence) => Format.fancyToolchain(sequence))

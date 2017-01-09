@@ -29,10 +29,13 @@ var argv = yargs
   .describe('t', 'The target format.')
   .alias('u', 'updateCache')
   .describe('u', 'Update the cache (do not use cached values).')
+  .alias('r', 'require')
+  .describe('r', 'Add toolchain requirements to activate certain tools like "typify" to enable resolving types.')
+  .array('r')
   .alias('l', 'library')
   .describe('l', 'Library URI for the component library. Defaults to BUGGY_LIBRARY_HOST or "http://localhost:8088".')
   .default('l', libraryURI)
-  .global(['updateCache', 'from', 'to', 'library'])
+  .global(['updateCache', 'from', 'to', 'library', 'require'])
   .demand('t')
   .command('list-inputs', 'List all available input types', command(() => console.log(Format.tools(ToolAPI.inputs(Toolchain, NPM)))))
   .commandDir('cli')
@@ -46,7 +49,7 @@ if (!global.wasCommand) {
     if (argv.updateCache) {
       provider = NPMUpdate
     }
-    return run(input, argv.to, [], Toolchain, provider)
+    return run(input, argv.to, argv.require || [], Toolchain, provider)
   })
   .then((output) => {
     console.log(output)

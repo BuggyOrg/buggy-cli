@@ -69,6 +69,7 @@ export const resolve = {
 }
 
 export const typify = {
+  name: 'typify',
   module: '@buggyorg/typify',
   consumes: 'portgraph',
   produces: 'portgraph',
@@ -76,6 +77,7 @@ export const typify = {
   activatedBy: ['typify']
 }
 
+/*
 export const optimize = {
   module: '@buggyorg/nitro',
   consumes: 'portgraph',
@@ -84,7 +86,6 @@ export const optimize = {
   activatedBy: ['optimize']
 }
 
-/*
 export const gogen = {
   module: '@buggyorg/codegen',
   consumes: 'portgraph',

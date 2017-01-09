@@ -88,26 +88,26 @@ export function outputDependencies (outputs, tools = Toolchain, provider) {
 
 export function sequenceDependencies (sequence, tools = Toolchain, provider) {
   var graph = new Graph({ directed: true })
-  sequence.forEach((tool) => graph.setNode(tool.name, tool))
+  var depGraph = dependencyGraph(graph, sequence, tools, provider)
+  sequence.forEach((tool) => depGraph.setNode(tool.name, tool))
   // simplify this shit... every dependency must be in the graph,
   // but it also must take the sequence into account. Therefore add a
   // edge for each dependency and from the predecessor add an edge from the
   // depdency to the predecessor. Except when the dependency is the predecessor...
-  betweenPairs((from, to) => graph.setEdge(to.name, from.name) &&
+  betweenPairs((from, to) => depGraph.setEdge(to.name, from.name) &&
     (to.depends || []).forEach((dep) => {
-      graph.setNode(dep, tools[dep])
-      graph.setEdge(to.name, dep)
+      depGraph.setNode(dep, tools[dep])
+      depGraph.setEdge(to.name, dep)
       if (from.name !== dep && from.produces === tools[dep].consumes && !contains(dep, from.depends)) {
-        graph.setEdge(dep, from.name)
+        depGraph.setEdge(dep, from.name)
         // apply this for all the dependencies of the dependencies.. should probalby be recursive here...
         ;(tools[dep].depends || []).forEach((d) => {
           if (from.name !== d && from.produces === tools[d].consumes && !contains(d, from.depends)) {
-            graph.setEdge(d, from.name)
+            depGraph.setEdge(d, from.name)
           }
         })
       }
     }), sequence)
-  var depGraph = dependencyGraph(graph, sequence, tools, provider)
   checkCycles(depGraph)
   return alg.topsort(depGraph).reverse().map((t) => tools[t])
 }

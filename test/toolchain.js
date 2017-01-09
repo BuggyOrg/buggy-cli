@@ -70,6 +70,21 @@ describe('Buggy CLI - Toolchain', function () {
       expect(depSeq.map((t) => t.name)).to.eql(['A', 'transform2', 'depC', 'C', 'transform3', 'B'])
     })
 
+    it('Chains dependency in the right order', () => {
+      const toolchain = {
+        A: {name: 'A', consumes: '-', produces: 'outA'},
+        B: {name: 'B', consumes: 'inB', produces: '--', depends: ['depD', 'depE']},
+        C: {name: 'C', consumes: 'inC', produces: 'outC'},
+        depD: {name: 'depD', consumes: 'inC', produces: 'inC', depends: ['depE']},
+        depE: {name: 'depE', consumes: 'inC', produces: 'inC'},
+        transform2: {name: 'transform2', consumes: 'outA', produces: 'inC'},
+        transform3: {name: 'transform3', consumes: 'outC', produces: 'inB'}
+      }
+      var newSeq = ToolchainGen.connectTools(['A', 'B'].map((t) => toolchain[t]), toolchain)
+      var depSeq = ToolchainGen.sequenceDependencies(newSeq, toolchain)
+      expect(depSeq.map((t) => t.name)).to.eql(['A', 'transform2', 'depE', 'depD', 'C', 'transform3', 'B'])
+    })
+
     it('Fails with cyclic dependencies', () => {
       const toolchain = {
         B: {name: 'B', depends: ['D']}, C: {name: 'C', depends: []},
