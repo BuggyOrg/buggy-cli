@@ -10,7 +10,7 @@ export const command = 'show-toolchain'
 export const description = 'Show the toolchain to create a given output'
 export const builder = (yargs) => {
   return yargs
-    .demand(['to'])
+    .demandOption(['to'])
 }
 
 export const handler = (argv) => {

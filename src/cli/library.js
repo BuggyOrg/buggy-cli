@@ -8,7 +8,7 @@ export const command = 'library'
 export const description = 'Library functionalities'
 export const builder = (yargs) => {
   // hacky-di-hack remove demand for t
-  delete yargs.getDemanded()['t']
+  delete yargs.getDemandedOptions()['t']
   // add commands from library-client
   var provider = NPM
   return library(yargs,

@@ -38,7 +38,7 @@ var argv = yargs
   .describe('l', 'Library URI for the component library. Defaults to BUGGY_LIBRARY_HOST or "http://localhost:8088".')
   .default('l', libraryURI)
   .global(['updateCache', 'from', 'to', 'library', 'require'])
-  .demand('t')
+  .demandOption('t')
   .command('list-inputs', 'List all available input types', command(() => console.log(Format.tools(ToolAPI.inputs(Toolchain, NPM)))))
   .commandDir('cli')
   .help()
