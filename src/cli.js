@@ -9,6 +9,8 @@ import * as ToolAPI from './tools'
 import * as Format from './format'
 import yargs from 'yargs'
 import cliExt from 'cli-ext'
+import ora from 'ora'
+import wrapProvider from './cli-util/npmWrapper'
 
 debugger
 
@@ -23,6 +25,9 @@ const command = (fn) => {
 }
 
 var libraryURI = process.env.BUGGY_LIBRARY_HOST || 'http://localhost:8088'
+
+const spinner = ora()
+global.buggyCliSpinner = spinner // TODO remove this global
 
 var argv = yargs
   .alias('f', 'from')
@@ -47,11 +52,8 @@ var argv = yargs
 if (!global.wasCommand) {
   cliExt.input(argv._[0])
   .then((input) => {
-    var provider = NPM
-    if (argv.updateCache) {
-      provider = NPMUpdate
-    }
-    return run(input, argv.to, argv.require || [], Toolchain, provider)
+    const provider = argv.updateCache ? NPMUpdate : NPM
+    return run(input, argv.to, argv.require || [], Toolchain, wrapProvider(provider, { spinner }))
   })
   .then((output) => {
     console.log(output)
