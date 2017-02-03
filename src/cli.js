@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+// #!/usr/bin/env node
 /* global __dirname, process */
 
 import * as Toolchain from './toolchain'
@@ -9,6 +9,8 @@ import * as ToolAPI from './tools'
 import * as Format from './format'
 import yargs from 'yargs'
 import cliExt from 'cli-ext'
+
+debugger
 
 // communicate with the other cli commands via a global variable.
 global.wasCommand = false

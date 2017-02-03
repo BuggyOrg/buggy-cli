@@ -17,6 +17,21 @@
       "console": "internalConsole",
       "sourceMaps": true,
       "smartStep": true
+    },
+    {
+      "name": "Debug",
+      "type": "node2",
+      "request": "launch",
+      "program": "${workspaceRoot}/.vscode/debug.js",
+      "cwd": "${workspaceRoot}",
+      "args": ["library", "list"],
+      "env": {
+        "NODE_ENV": "development",
+        "BUGGY_LIBRARY_HOST": "http://quasar:8878/"
+      },
+      "console": "internalConsole",
+      "sourceMaps": true,
+      "smartStep": false
     }
   ]
 }
