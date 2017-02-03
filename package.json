@@ -1,6 +1,6 @@
 {
   "name": "@buggyorg/buggy",
-  "version": "0.1.27",
+  "version": "0.2.0-pre.1",
   "description": "CLI for Buggy.",
   "main": "./lib/api.js",
   "bin": {
