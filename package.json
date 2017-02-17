@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@buggyorg/library-cli": "^0.1.5",
+    "babel-runtime": "^6.23.0",
     "chalk": "^1.1.3",
     "child-process-promise": "^2.2.0",
     "cli-ext": "^1.1.0",
