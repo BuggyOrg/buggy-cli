@@ -66,7 +66,7 @@ describe('Buggy API', () => {
     it('Can run an installed package', function () {
       this.timeout(60000)
       return expect(API.prepareToolchain([{module: '@buggyorg/portgraph2kgraph'}], NPM)
-      .then((toolchain) => API.runToolChain(toolchain, '{"nodes": [], "edges": []}', NPM)))
+      .then((toolchain) => API.runToolChain(toolchain, '{"nodes": [], "edges": [], "id": "#root"}', NPM)))
       .to.be.fulfilled
     })
   })
