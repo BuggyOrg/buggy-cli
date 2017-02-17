@@ -1,4 +1,3 @@
-
 import * as ToolAPI from './tools'
 import flatten from 'lodash/fp/flatten'
 import uniq from 'lodash/fp/uniq'
@@ -52,10 +51,21 @@ export function prepareToolchain (sequence, provider) {
     .then(() => toolchain))
 }
 
-export function runToolChain (toolchain, data, provider) {
-  if (toolchain.length === 0) return Promise.resolve(data)
-  return ToolAPI.execute(toolchain[0], data, provider)
-  .then((res) => runToolChain(toolchain.slice(1), res, provider))
+export async function runToolChain (toolchain, input, provider, { onStartTool, onFinishTool } = {}) {
+  let output = input
+
+  for (const tool of toolchain) {
+    if (onStartTool != null) onStartTool(tool)
+    try {
+      output = await ToolAPI.execute(tool, output, provider)
+      if (onFinishTool != null) onFinishTool(null, tool)
+    } catch (err) {
+      if (onFinishTool != null) onFinishTool(err, tool)
+      throw err
+    }
+  }
+
+  return output
 }
 
 export function createSequenceFromInput (input, output, args, tools, provider) {
@@ -88,9 +98,9 @@ export function toolchainSequenceFromInput (input, output, args, tools, provider
   .then((sequence) => prepareToolchain(sequence, provider))
 }
 
-export function run (input, output, args, tools, provider) {
-  return toolchainSequenceFromInput(input, output, args, tools, provider)
-  .then((sequence) => runToolChain(sequence, input, provider))
+export async function run (input, output, args, tools, provider, { onStartTool, onFinishTool }) {
+  const sequence = await toolchainSequenceFromInput(input, output, args, tools, provider)
+  return await runToolChain(sequence, input, provider, { onStartTool, onFinishTool })
 }
 
 export function graphToInputFormat (graph, tools, provider) {
