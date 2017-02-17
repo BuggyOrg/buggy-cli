@@ -51,7 +51,7 @@ export function prepareToolchain (sequence, provider) {
     .then(() => toolchain))
 }
 
-export async function runToolChain (toolchain, input, provider, { onStartTool, onFinishTool } = {}) {
+export async function runToolchain (toolchain, input, provider, { onStartTool, onFinishTool } = {}) {
   let output = input
 
   for (const tool of toolchain) {
@@ -102,7 +102,7 @@ export async function run (input, output, args, tools, provider, { onStartTool, 
   if (onStartBuildToolChain != null) onStartBuildToolChain()
   const sequence = await toolchainSequenceFromInput(input, output, args, tools, provider)
   if (onFinishBuildToolchain != null) onFinishBuildToolchain(sequence)
-  return await runToolChain(sequence, input, provider, { onStartTool, onFinishTool })
+  return await runToolchain(sequence, input, provider, { onStartTool, onFinishTool })
 }
 
 export function graphToInputFormat (graph, tools, provider) {
