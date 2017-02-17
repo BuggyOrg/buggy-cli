@@ -10,7 +10,7 @@ import * as Format from './format'
 import yargs from 'yargs'
 import cliExt from 'cli-ext'
 import ora from 'ora'
-import wrapProvider from './cli-util/npmWrapper'
+import { npmWrapper as wrapProvider, getToolDisplayName } from './cli-util'
 
 debugger
 
@@ -54,22 +54,29 @@ if (!global.wasCommand) {
   .then((input) => {
     const provider = argv.updateCache ? NPMUpdate : NPM
     return run(input, argv.to, argv.require || [], Toolchain, wrapProvider(provider, { spinner }), {
-      onStartTool ({ name, version, consumes, produces }) {
-        if (consumes === produces) {
-          spinner.start().text = `Transforming ${consumes} using ${name}@${version}`
+      onStartTool (tool) {
+        if (tool.consumes === tool.produces) {
+          spinner.start().text = `Transform ${tool.consumes} using ${getToolDisplayName(tool)}`
         } else {
-          spinner.start().text = `Transforming ${consumes} to ${produces} using ${name}@${version}`
+          spinner.start().text = `Transform ${tool.consumes} to ${tool.produces} using ${getToolDisplayName(tool)}`
         }
       },
       
-      onFinishTool (err, { name, version }) {
-        if (err) {
+      onFinishTool (err, tool) {
+        if (err) { // note: run already printed the error
           spinner.fail()
           process.exitCode = 1
-          console.error(err)
         } else {
           spinner.succeed()
         }
+      },
+
+      onStartBuildToolChain () {
+        spinner.start().text = 'Build toolchain'
+      },
+
+      onFinishBuildToolchain (toolchain) {
+        spinner.succeed(`Build toolchain: ${toolchain.length} ${toolchain.length === 1 ? 'step' : 'steps'}`)
       }
     })
   })

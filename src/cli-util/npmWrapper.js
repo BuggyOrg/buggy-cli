@@ -3,7 +3,7 @@ export default function wrapProvider (provider, { spinner }) {
     ...provider,
 
     install (dependency, version, path) {
-      spinner.start().text = `Installing ${dependency}@${version}`
+      spinner.start().text = `Install ${dependency}@${version}`
       const promise = provider.install(dependency, version, path)
       promise
         .then(() => spinner.succeed())

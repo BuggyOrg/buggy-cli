@@ -98,8 +98,10 @@ export function toolchainSequenceFromInput (input, output, args, tools, provider
   .then((sequence) => prepareToolchain(sequence, provider))
 }
 
-export async function run (input, output, args, tools, provider, { onStartTool, onFinishTool }) {
+export async function run (input, output, args, tools, provider, { onStartTool, onFinishTool, onStartBuildToolChain, onFinishBuildToolchain }) {
+  if (onStartBuildToolChain != null) onStartBuildToolChain()
   const sequence = await toolchainSequenceFromInput(input, output, args, tools, provider)
+  if (onFinishBuildToolchain != null) onFinishBuildToolchain(sequence)
   return await runToolChain(sequence, input, provider, { onStartTool, onFinishTool })
 }
 
