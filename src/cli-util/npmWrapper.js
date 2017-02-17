@@ -7,7 +7,7 @@ export default function wrapProvider (provider, { spinner }) {
       const promise = provider.install(dependency, version, path)
       promise
         .then(() => spinner.succeed())
-        .catch((e) => fail(e))
+        .catch((e) => spinner.fail(e))
       return promise
     }
   }

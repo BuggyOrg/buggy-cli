@@ -53,7 +53,24 @@ if (!global.wasCommand) {
   cliExt.input(argv._[0])
   .then((input) => {
     const provider = argv.updateCache ? NPMUpdate : NPM
-    return run(input, argv.to, argv.require || [], Toolchain, wrapProvider(provider, { spinner }))
+    return run(input, argv.to, argv.require || [], Toolchain, wrapProvider(provider, { spinner }), {
+      onStartTool ({ name, version, consumes, produces }) {
+        if (consumes === produces) {
+          spinner.start().text = `Transforming ${consumes} using ${name}@${version}`
+        } else {
+          spinner.start().text = `Transforming ${consumes} to ${produces} using ${name}@${version}`
+        }
+      },
+      
+      onFinishTool (err, { name, version }) {
+        if (err) {
+          spinner.fail()
+          console.error(err)
+        } else {
+          spinner.succeed()
+        }
+      }
+    })
   })
   .then((output) => {
     console.log(output)
