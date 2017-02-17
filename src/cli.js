@@ -65,6 +65,7 @@ if (!global.wasCommand) {
       onFinishTool (err, { name, version }) {
         if (err) {
           spinner.fail()
+          process.exitCode = 1
           console.error(err)
         } else {
           spinner.succeed()
@@ -75,5 +76,8 @@ if (!global.wasCommand) {
   .then((output) => {
     console.log(output)
   })
-  .catch((err) => { console.error(err) })
+  .catch((err) => {
+    process.exitCode = 1
+    console.error(err)
+  })
 }
