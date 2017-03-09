@@ -12,14 +12,27 @@ export const lisgy = {
   args: ''
 }
 
-export const json = {
-  name: 'json',
+export const portgraphJSON = {
+  name: 'portgraphJSON',
   consumes: 'input',
   produces: 'portgraph',
   activatedBy: [(input) => {
     try {
-      JSON.parse(input)
-      return true
+      const parsed = JSON.parse(input)
+      return parsed.nodes != null // when children is defined it is a kgraph
+    } catch (err) { return false }
+  }],
+  command: (input) => input
+}
+
+export const kgraphJSON = {
+  name: 'kgraphJSON',
+  consumes: 'input',
+  produces: 'kgraph',
+  activatedBy: [(input) => {
+    try {
+      const parsed = JSON.parse(input)
+      return parsed.children != null // when children is defined it is a kgraph
     } catch (err) { return false }
   }],
   command: (input) => input
