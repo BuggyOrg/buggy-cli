@@ -47,10 +47,9 @@ export async function cliInterface (pkg, version, path) {
  * the package does not depend on the dependency it will return null.
  */
 export async function dependencyVersion (pkg, pkgVersion, dependency) {
-  const dependency = await exec('npm view ' + pkg + ((pkgVersion) ? ('@' + pkgVersion) : '') + ' dependencies.' + dependency + ' --json')
-  if (/undefined/.test(dependency.stdout) || dependency.stdout.length < 2)
-    return null
-  return deRange(dependency.stdout.slice(1, -2))
+  const { stdout } = await exec('npm view ' + pkg + ((pkgVersion) ? ('@' + pkgVersion) : '') + ' dependencies.' + dependency + ' --json')
+  if (/undefined/.test(stdout) || stdout.length < 2) return null
+  return deRange(stdout.slice(1, -2))
 }
 
 /**
