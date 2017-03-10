@@ -25,7 +25,7 @@ const deRange = (versionRange) => {
 export const install = (dependency, version, path) => {
   var opts = {cwd: path, env: merge(process.env, {NODE_ENV: 'production'})}
   return mkdirp(path)
-  .then(() => exec('npm pack ' + dependency + '@' + version, opts))
+  .then(() => exec(`npm pack ${dependency}@${version} -q`, opts))
   .then((res) => res.stdout.trim())
   .then((tar) => exec('tar -xzf ' + tar + ' --strip-components=1 package', opts).then(() => tar))
   .then((tar) => exec('rm ' + tar, opts))
