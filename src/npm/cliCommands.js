@@ -46,7 +46,7 @@ export async function cliInterface (pkg, version, path) {
  * @returns {String} A Semver string specifying the version of the dependency. If
  * the package does not depend on the dependency it will return null.
  */
-export async function dependencyVersion = (pkg, pkgVersion, dependency) {
+export async function dependencyVersion (pkg, pkgVersion, dependency) {
   const dependency = await exec('npm view ' + pkg + ((pkgVersion) ? ('@' + pkgVersion) : '') + ' dependencies.' + dependency + ' --json')
   if (/undefined/.test(dependency.stdout) || dependency.stdout.length < 2)
     return null
