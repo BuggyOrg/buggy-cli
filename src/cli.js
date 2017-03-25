@@ -85,6 +85,6 @@ if (!global.wasCommand) {
   })
   .catch((err) => {
     process.exitCode = 1
-    console.error(err)
+    console.error(err.stack || err)
   })
 }
