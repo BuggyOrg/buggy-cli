@@ -28,11 +28,12 @@ export async function install (dependency, version, path) {
   await mkdirp(path)
   const res = await exec(`npm pack ${dependency}@${version} -q`, opts)
   const tar = join(path, res.stdout.trim())
-  await exec('tar -xzf ' + tar + ' --strip-components=1 package', opts)
-  if (fs.existsSync(tar)) {
-    fs.unlink(tar) // we don't care about errors here
+  if (!fs.existsSync(tar)) {
+    throw new Error(`Expected tar file but doesn't exist: ${tar}`)
   }
+  await exec('tar -xzf ' + tar + ' --strip-components=1 package', opts)
   await exec('npm i', opts)
+  fs.unlink(tar) // we don't care about errors here
 }
 
 export async function cliInterface (pkg, version, path) {
