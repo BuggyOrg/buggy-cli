@@ -42,6 +42,7 @@
     "function-cache": "LittleHelicase/function-cache#8e95eeb1f204c24f43470abb848adbc9d3852cc5",
     "get-stdin": "^5.0.1",
     "graphlib": "^2.1.1",
+    "lockfile": "^1.0.3",
     "lodash": "^4.17.2",
     "mkdirp-then": "^1.2.0",
     "ora": "^1.1.0",

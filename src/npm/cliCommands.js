@@ -8,6 +8,7 @@ import merge from 'lodash/fp/merge'
 import mkdirp from 'mkdirp-then'
 import {join} from 'path'
 import fs from 'fs'
+import lockFile from 'lockfile'
 
 const deRange = (versionRange) => {
   var prefix = versionRange[0]
@@ -26,14 +27,34 @@ const deRange = (versionRange) => {
 export async function install (dependency, version, path) {
   var opts = { cwd: path, env: merge(process.env, {NODE_ENV: 'production'}) }
   await mkdirp(path)
-  const res = await exec(`npm pack ${dependency}@${version} -q`, opts)
-  const tar = join(path, res.stdout.trim())
-  if (!fs.existsSync(tar)) {
-    throw new Error(`Expected tar file but doesn't exist: ${tar}`)
-  }
-  await exec('tar -xzf ' + tar + ' --strip-components=1 package', opts)
-  await exec('npm i', opts)
-  fs.unlink(tar) // we don't care about errors here
+  return new Promise((resolve, reject) => {
+    const lock = join(path, 'buggycli.lock')
+    lockFile.lock(lock, { wait: 1000, retries: 600, retryWait: 1000 }, (err) => {
+      if (err) reject(err)
+      Promise.resolve(async () => {
+        const res = await exec(`npm pack ${dependency}@${version} -q`, opts)
+        const tar = join(path, res.stdout.trim())
+        if (!fs.existsSync(tar)) {
+          throw new Error(`Expected tar file but doesn't exist: ${tar}`)
+        }
+        await exec('tar -xzf ' + tar + ' --strip-components=1 package', opts)
+        await exec('npm i', opts)
+        fs.unlink(tar) // we don't care about errors here
+      })
+      .then(() => {
+        lockFile.unlock(lock, (err) => {
+          if (err) reject(err)
+          else resolve()
+        })
+      })
+      .catch((e) => {
+        lockFile.unlock(lock, (err) => {
+          if (err) reject(err)
+          else reject(e)
+        })
+      })
+    })
+  })
 }
 
 export async function cliInterface (pkg, version, path) {
