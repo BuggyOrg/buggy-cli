@@ -29,30 +29,31 @@ export async function install (dependency, version, path) {
   await mkdirp(path)
   return new Promise((resolve, reject) => {
     const lock = join(path, 'buggycli.lock')
-    lockFile.lock(lock, { wait: 1000, retries: 600, retryWait: 1000 }, (err) => {
-      if (err) reject(err)
-      Promise.resolve(async () => {
-        const res = await exec(`npm pack ${dependency}@${version} -q`, opts)
-        const tar = join(path, res.stdout.trim())
-        if (!fs.existsSync(tar)) {
-          throw new Error(`Expected tar file but doesn't exist: ${tar}`)
-        }
-        await exec('tar -xzf ' + tar + ' --strip-components=1 package', opts)
-        await exec('npm i', opts)
-        fs.unlink(tar) // we don't care about errors here
-      })
-      .then(() => {
-        lockFile.unlock(lock, (err) => {
-          if (err) reject(err)
-          else resolve()
-        })
-      })
-      .catch((e) => {
-        lockFile.unlock(lock, (err) => {
-          if (err) reject(err)
-          else reject(e)
-        })
-      })
+    // locking is retries for 10 minutes (every 250 ms)
+    lockFile.lock(lock, { retries: 10 * 60 * 4, retryWait: 250 }, (err) => {
+      if (err) {
+        reject(err)
+      } else {
+        (async () => {
+          try {
+            const res = await exec(`npm pack ${dependency}@${version} -q`, opts)
+            const tar = join(path, res.stdout.trim())
+            if (!fs.existsSync(tar)) {
+              throw new Error(`Expected tar file but doesn't exist: ${tar}`)
+            }
+            await exec('tar -xzf ' + tar + ' --strip-components=1 package', opts)
+            await exec('npm i', opts)
+            fs.unlink(tar) // we don't care about errors here
+            resolve()
+          } catch (e) {
+            reject(e)
+          } finally {
+            lockFile.unlock(lock, (err) => {
+              if (err) reject(err)
+            })
+          }
+        })()
+      }
     })
   })
 }
