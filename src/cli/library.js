@@ -10,7 +10,7 @@ function tryParse (str) {
   try {
     return Promise.resolve(JSON.parse(str))
   } catch (err) {
-    return Promise.reject('Cannot parse input string:\n' + str)
+    return Promise.reject(new Error('Cannot parse input string:\n' + str))
   }
 }
 

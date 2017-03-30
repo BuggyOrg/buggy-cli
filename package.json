@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "standard src/**/*.js && npm run build && mocha --compilers js:babel-register",
+    "lint": "standard src/**/*.js",
     "build": "babel src -d lib",
     "prepublish": "babel src -d lib"
   },
@@ -18,6 +19,7 @@
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.6.5",
+    "babel-eslint": "^7.2.1",
     "babel-plugin-transform-object-rest-spread": "^6.22.0",
     "babel-plugin-transform-runtime": "^6.22.0",
     "babel-preset-latest": "^6.22.0",
@@ -60,5 +62,8 @@
   "bugs": {
     "url": "https://github.com/BuggyOrg/buggy-cli/issues"
   },
-  "homepage": "https://github.com/BuggyOrg/buggy-cli#readme"
+  "homepage": "https://github.com/BuggyOrg/buggy-cli#readme",
+  "standard": {
+    "parser": "babel-eslint"
+  }
 }
