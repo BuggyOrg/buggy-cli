@@ -54,19 +54,15 @@ export const listTools = () => {
 export const dependencyPath = (dependency, version) =>
   (dependency && version) ? join(cachePath(), dependency, version) : ''
 
-export const install = (tool, provider) => {
-  return init()
-  .then(() => isNPMDependency(tool.module))
-  .then((isNPM) => {
-    if (isNPM) {
-      var depPath = dependencyPath(tool.module, tool.version)
-      var pjson = join(depPath, 'package.json')
-      if (fs.existsSync(depPath) && fs.existsSync(pjson)) return Promise.resolve()
-      return provider.install(tool.module, tool.version, depPath)
-    } else {
-      return Promise.resolve()
+export async function install (tool, provider) {
+  await init()
+  if (await isNPMDependency(tool.module)) {
+    var depPath = dependencyPath(tool.module, tool.version)
+    var pjson = join(depPath, 'package.json')
+    if (!fs.existsSync(depPath) || !fs.existsSync(pjson)) {
+      await provider.install(tool.module, tool.version, depPath)
     }
-  })
+  }
 }
 
 export const execute = (tool, input, provider) => {
