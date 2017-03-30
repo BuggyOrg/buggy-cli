@@ -7,6 +7,7 @@ import {exec} from 'child-process-promise'
 import merge from 'lodash/fp/merge'
 import mkdirp from 'mkdirp-then'
 import {join} from 'path'
+import fs from 'fs'
 
 const deRange = (versionRange) => {
   var prefix = versionRange[0]
@@ -26,9 +27,12 @@ export async function install (dependency, version, path) {
   var opts = { cwd: path, env: merge(process.env, {NODE_ENV: 'production'}) }
   await mkdirp(path)
   const res = await exec(`npm pack ${dependency}@${version} -q`, opts)
-  const tar = res.stdout.trim()
+  const tar = join(path, res.stdout.trim())
   await exec('tar -xzf ' + tar + ' --strip-components=1 package', opts)
-  await Promise.all([exec('rm ' + tar, opts), exec('npm i', opts)])
+  if (fs.existsSync(tar)) {
+    fs.unlink(tar) // we don't care about errors here
+  }
+  await exec('npm i', opts)
 }
 
 export async function cliInterface (pkg, version, path) {
