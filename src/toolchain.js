@@ -5,7 +5,7 @@
 export const lisgy = {
   name: 'lisgy',
   module: '@buggyorg/lisgy',
-  minVersion: '0.2.0-pre.3',
+  minVersion: '0.2.0-pre.4',
   consumes: 'input',
   produces: 'portgraph',
   activatedBy: ['$<bin>'],
