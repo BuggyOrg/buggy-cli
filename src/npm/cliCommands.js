@@ -8,6 +8,7 @@ import merge from 'lodash/fp/merge'
 import mkdirp from 'mkdirp-then'
 import {join} from 'path'
 import fs from 'fs'
+import fsp from 'fs-promise'
 import lockFile from 'lockfile'
 
 const deRange = (versionRange) => {
@@ -30,29 +31,31 @@ export async function install (dependency, version, path) {
   return new Promise((resolve, reject) => {
     const lock = join(path, 'buggycli.lock')
     // locking is retries for 10 minutes (every 250 ms)
-    lockFile.lock(lock, { retries: 10 * 60 * 4, retryWait: 250 }, (err) => {
+    lockFile.lock(lock, { retries: 10 * 60 * 4, retryWait: 250 }, async (err) => {
       if (err) {
         reject(err)
       } else {
-        (async () => {
-          try {
-            const res = await exec(`npm pack ${dependency}@${version} -q`, opts)
-            const tar = join(path, res.stdout.trim())
-            if (!fs.existsSync(tar)) {
-              throw new Error(`Expected tar file but doesn't exist: ${tar}`)
-            }
-            await exec('tar -xzf ' + tar + ' --strip-components=1 package', opts)
-            await exec('npm i', opts)
-            fs.unlink(tar) // we don't care about errors here
-            resolve()
-          } catch (e) {
-            reject(e)
-          } finally {
-            lockFile.unlock(lock, (err) => {
-              if (err) reject(err)
-            })
+        try {
+          const res = await exec(`npm pack ${dependency}@${version} -q`, opts)
+          const tar = join(path, res.stdout.trim())
+          if (!fs.existsSync(tar)) {
+            throw new Error(`Expected tar file but doesn't exist: ${tar}`)
           }
-        })()
+          await exec('tar -xzf ' + tar + ' --strip-components=1 package', opts)
+          await exec('npm i', opts)
+          try {
+            await fsp.unlink(tar)
+          } catch (e) {
+            // we don't care about errors here, but we don't want to remove the lock file before the tar is removed
+          }
+          resolve()
+        } catch (e) {
+          reject(e)
+        } finally {
+          lockFile.unlock(lock, (err) => {
+            if (err) reject(err)
+          })
+        }
       }
     })
   })
