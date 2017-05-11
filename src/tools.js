@@ -71,7 +71,12 @@ export const execute = (tool, input, provider) => {
 
 export const run = (tool, input, execString, provider) => {
   if (tool.command) {
-    return Promise.resolve(tool.command(input))
+    return Promise.resolve(tool.command(
+      input, {
+        path: dependencyPath(tool.module, tool.version),
+        version: tool.version
+      }
+    ))
   }
   return provider.cliInterface(tool.module, tool.version, dependencyPath(tool.module, tool.version))
   .then((bin) => {
@@ -210,6 +215,6 @@ export function inputs (toolchain, provider) {
   return promiseSequence(
     Object.keys(toolchain).map((k) => toolchain[k]).filter((tool) => tool.consumes.includes('input'))
     .map((tool) => () => (!tool.module) ? tool : latestVersion(tool, provider)
-      .then((latest) => extend(tool, {version: latest}))
+      .then((latest) => Object.assign(tool, {version: latest}))
       .then((tool) => install(tool, provider).then(() => tool))))
 }

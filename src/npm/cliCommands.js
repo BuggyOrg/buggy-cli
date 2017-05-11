@@ -26,6 +26,9 @@ const deRange = (versionRange) => {
  *   reject.
  */
 export async function install (dependency, version, path) {
+  if (!version) {
+    throw new Error('Cannot install dependency "' + dependency + '" without a valid version.')
+  }
   var opts = { cwd: path, env: merge(process.env, {NODE_ENV: 'production'}) }
   await mkdirp(path)
   return new Promise((resolve, reject) => {

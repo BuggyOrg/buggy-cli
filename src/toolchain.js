@@ -1,3 +1,6 @@
+import path from 'path'
+import * as Graph from '@buggyorg/graphtools'
+
 /**
  * Defines the Buggy toolchain.
  */
@@ -8,8 +11,13 @@ export const lisgy = {
   minVersion: '0.2.0-pre.4',
   consumes: 'input',
   produces: 'portgraph',
-  activatedBy: ['$<bin>'],
-  args: ''
+  activatedBy: [(input) => true],
+  command: (input, { path: lisgyPath }) => {
+    // the second argument currently contains path and version
+    const parse = require(path.join(lisgyPath, 'lib', 'parser')).parse
+    const compile = require(path.join(lisgyPath, 'lib', 'compiler')).compile
+    return JSON.stringify(Graph.toJSON(compile(parse(input))))
+  }
 }
 
 export const portgraphJSON = {
