@@ -70,32 +70,66 @@ export const execute = (tool, input, provider) => {
 }
 
 export const run = (tool, input, execString, provider) => {
+  return startRun(tool, execString, provider)
+  .then((runTool) => runTool(input))
+}
+
+export const startExecute = (tool, provider) => {
+  return startRun(tool, '$<bin> $<args>', provider)
+}
+
+/**
+ * Starts the given tool and returns a function that takes the input and
+ * lets the tool run (e.g. pipes the input into stdin).
+ * @param {object} tool tool object
+ * @param {string} execString exec string for the tool
+ * @param {object} provider package provider
+ * @returns {Promise} a promise that resolves to the runner function
+ */
+export const startRun = async (tool, execString, provider) => {
   if (tool.command) {
-    return Promise.resolve(tool.command(
+    return (input) => Promise.resolve(tool.command(
       input, {
         path: dependencyPath(tool.module, tool.version),
         version: tool.version
       }
     ))
   }
-  return provider.cliInterface(tool.module, tool.version, dependencyPath(tool.module, tool.version))
-  .then((bin) => {
-    var args = []
+
+  const bin = await provider.cliInterface(tool.module, tool.version, dependencyPath(tool.module, tool.version))
+  if (execString.indexOf('$<input>') >= 0) {
+    let args = []
     if (typeof (tool.args) === 'string') {
       args = tool.args
     } else if (Array.isArray(tool.args)) {
       args = tool.args.join(' ')
     }
-    const execution = execString.replace('$<bin>', bin).replace('$<input>', input).replace('$<args>', args)
+
+    return async (input) => {
+      const execution = execString.replace('$<bin>', bin).replace('$<input>', input).replace('$<args>', args)
+      const { stdout } = await exec(((tool.noNode) ? '' : 'node ') + execution)
+      return stdout.trim()
+    }
+  } else {
+    let args = []
+    if (typeof (tool.args) === 'string') {
+      args = tool.args
+    } else if (Array.isArray(tool.args)) {
+      args = tool.args.join(' ')
+    }
+    const execution = execString.replace('$<bin>', bin).replace('$<args>', args)
     var binExec = exec(((tool.noNode) ? '' : 'node ') + execution)
     binExec.childProcess.stdin.on('error', () => null) // ignore if the program closes too early
-    if (execString.indexOf('$<input>') === -1 && !binExec.childProcess.stdin.destroyed) {
-      binExec.childProcess.stdin.write(input)
+
+    return async (input) => {
+      if (!binExec.childProcess.stdin.destroyed) {
+        binExec.childProcess.stdin.write(input)
+      }
+      binExec.childProcess.stdin.end()
+      const { stdout } = await binExec
+      return stdout.trim()
     }
-    binExec.childProcess.stdin.end()
-    return binExec
-  })
-  .then((result) => result.stdout.trim())
+  }
 }
 
 /* ### use API directly.. in the future... ###

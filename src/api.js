@@ -54,10 +54,15 @@ export function prepareToolchain (sequence, provider) {
 export async function runToolchain (toolchain, input, provider, { onStartTool, onFinishTool } = {}) {
   let output = input
 
-  for (const tool of toolchain) {
+  const runningTools = await Promise.all(toolchain.map(async (tool) => ({
+    tool,
+    runTool: await ToolAPI.startExecute(tool, provider)
+  })))
+
+  for (const { tool, runTool } of runningTools) {
     if (onStartTool != null) onStartTool(tool)
     try {
-      output = await ToolAPI.execute(tool, output, provider)
+      output = await runTool(output)
       if (onFinishTool != null) onFinishTool(null, tool)
     } catch (err) {
       if (onFinishTool != null) onFinishTool(err, tool)

@@ -134,6 +134,13 @@ describe('Buggy CLI - Tools', function () {
         return expect(Tools.execute({module: 'a', version: '1.0.0', args: ['abc'], noNode: true}, '', provider))
         .to.eventually.equal('abc')
       })
+
+      it('It can start a program and provide input later', async () => {
+        var provider = {cliInterface: () => Promise.resolve('tee')}
+        const runTool = await Tools.startExecute({module: 'a', version: '1.0.0', noNode: true}, provider)
+        const result = await runTool('abc')
+        expect(result).to.equal('abc')
+      })
     })
   })
 })
